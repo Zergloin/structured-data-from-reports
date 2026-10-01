@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_API__EXTRACTION_QUEUE
+!define ISIT_CONTAINER_RELATIONS_API__EXTRACTION_QUEUE
+Rel(api, extraction_queue, "Публикует задание: extract_document.v1, job_id", "AMQP 0-9-1 / TLS / TCP 5671")
+!endif

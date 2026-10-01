@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_NODES_EXTRACTION_QUEUE
+!define ISIT_CONTAINER_NODES_EXTRACTION_QUEUE
+ContainerQueue(extraction_queue, "Очередь извлечения", "RabbitMQ / AMQP 0-9-1", "Команды извлечения с job_id")
+!endif

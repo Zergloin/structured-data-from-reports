@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_NODES_FILES
+!define ISIT_CONTAINER_NODES_FILES
+ContainerDb(files, "Хранилище файлов", "Garage / S3 API", "Оригиналы, разобранные документы и выгрузки")
+!endif

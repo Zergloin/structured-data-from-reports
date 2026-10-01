@@ -1,0 +1,7 @@
+@startuml context
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Системный контекст: общее представление (C4, уровень 1)
+!include ../shared/master_content.puml
+footer Стрелка: пользователь или инициатор запроса → адресат. Ответы на запросы не показаны.
+@enduml

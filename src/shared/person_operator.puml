@@ -1,0 +1,4 @@
+!ifndef ISIT_SHARED_PERSON_OPERATOR
+!define ISIT_SHARED_PERSON_OPERATOR
+Person(operator, "Оператор загрузки", "Загружает отчёты и отслеживает обработку")
+!endif

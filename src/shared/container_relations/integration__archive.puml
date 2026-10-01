@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_INTEGRATION__ARCHIVE
+!define ISIT_CONTAINER_RELATIONS_INTEGRATION__ARCHIVE
+Rel(integration, archive, "Запрашивает файлы и метаданные новых версий", "HTTPS / REST / JSON, файлы")
+!endif

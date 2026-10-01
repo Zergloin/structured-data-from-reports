@@ -1,0 +1,4 @@
+!ifndef ISIT_SHARED_PERSON_CONSUMER
+!define ISIT_SHARED_PERSON_CONSUMER
+Person(consumer, "Потребитель данных", "Ищет и экспортирует подтверждённые записи")
+!endif

@@ -1,0 +1,8 @@
+!ifndef ISIT_EXTERNAL_LLM
+!define ISIT_EXTERNAL_LLM
+!ifdef ISIT_CONTAINER_VIEW
+System_Ext(llm, "Внешний сервис языковых моделей\n(OpenRouter)", "API доступа к выбранной языковой модели")
+!else
+System_Ext(llm, "Внешний сервис языковых моделей", "API доступа к выбранной языковой модели")
+!endif
+!endif

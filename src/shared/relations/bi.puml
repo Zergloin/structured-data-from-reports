@@ -1,0 +1,4 @@
+!ifndef ISIT_RELATIONS_BI
+!define ISIT_RELATIONS_BI
+Rel(report_system, bi, "Отправляет подтверждённые версии записей", "HTTPS / JSON")
+!endif

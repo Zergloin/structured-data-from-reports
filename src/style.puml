@@ -1,0 +1,23 @@
+!ifndef REPORT_SHARED_STYLE
+!define REPORT_SHARED_STYLE
+!define RELATIVE_INCLUDE
+!include_once vendor/C4_Component.puml
+!include_once vendor/C4_Deployment.puml
+!$ARROW_FONT_SIZE = 12
+!$DEFAULT_WRAP_WIDTH = 170
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam dpi 120
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 45
+skinparam classAttributeIconSize 10
+skinparam classBackgroundColor #F1F1F1
+skinparam classBorderColor #333333
+skinparam roundCorner 0
+AddElementTag("Вход", $bgColor="#BBD9F4", $fontColor="#16283C", $borderColor="#4F6578", $legendText="Вход")
+AddElementTag("Прикладная логика", $bgColor="#D7E8FF", $fontColor="#16283C", $borderColor="#4F6578", $legendText="Прикладная логика")
+AddElementTag("Предметная логика", $bgColor="#D7EFD5", $fontColor="#16283C", $borderColor="#4F6578", $legendText="Предметная логика")
+AddElementTag("Инфраструктура", $bgColor="#FFE7C2", $fontColor="#16283C", $borderColor="#4F6578", $legendText="Инфраструктура")
+!endif

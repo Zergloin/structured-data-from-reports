@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_ANALYST__WEB_APP
+!define ISIT_CONTAINER_RELATIONS_ANALYST__WEB_APP
+Rel(analyst, web_app, "Редактирует схемы и запрашивает сравнение", "Веб-интерфейс / HTTPS")
+!endif

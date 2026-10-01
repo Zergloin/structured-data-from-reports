@@ -1,0 +1,4 @@
+!ifndef ISIT_RELATIONS_CONSUME
+!define ISIT_RELATIONS_CONSUME
+Rel(consumer, report_system, "Запрашивает выборки и экспорт по фильтрам", "HTTPS / JSON, CSV")
+!endif

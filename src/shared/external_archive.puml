@@ -1,0 +1,4 @@
+!ifndef ISIT_EXTERNAL_ARCHIVE
+!define ISIT_EXTERNAL_ARCHIVE
+System_Ext(archive, "Корпоративный архив отчётов", "Внешняя система документооборота организации")
+!endif

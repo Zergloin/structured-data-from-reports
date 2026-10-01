@@ -1,0 +1,4 @@
+!ifndef ISIT_SHARED_PERSON_ADMIN
+!define ISIT_SHARED_PERSON_ADMIN
+Person(admin, "Администратор", "Управляет ролями, заданиями и интеграциями")
+!endif

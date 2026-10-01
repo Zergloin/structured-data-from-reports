@@ -1,0 +1,4 @@
+!ifndef ISIT_SHARED_PERSON_REVIEWER
+!define ISIT_SHARED_PERSON_REVIEWER
+Person(reviewer, "Эксперт-верификатор", "Сверяет поля с источником и подтверждает")
+!endif

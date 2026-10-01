@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_NODES_INTEGRATION_QUEUE
+!define ISIT_CONTAINER_NODES_INTEGRATION_QUEUE
+ContainerQueue(integration_queue, "Очередь интеграций", "RabbitMQ / AMQP 0-9-1", "Команды импорта и экспорта с job_id")
+!endif

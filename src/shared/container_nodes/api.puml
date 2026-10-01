@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_NODES_API
+!define ISIT_CONTAINER_NODES_API
+Container(api, "Прикладной сервер", "Python / FastAPI / Pydantic / SQLAlchemy", "Схемы, проверка, реестр; единый публикатор команд")
+!endif

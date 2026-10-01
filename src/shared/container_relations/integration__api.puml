@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_INTEGRATION__API
+!define ISIT_CONTAINER_RELATIONS_INTEGRATION__API
+Rel(integration, api, "Запрашивает задание и выгрузку; передаёт импорт и статус", "HTTPS / REST / JSON, multipart")
+!endif

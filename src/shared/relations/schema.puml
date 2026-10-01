@@ -1,0 +1,4 @@
+!ifndef ISIT_RELATIONS_SCHEMA
+!define ISIT_RELATIONS_SCHEMA
+Rel(analyst, report_system, "Публикует схемы и запрашивает сравнение", "HTTPS / JSON")
+!endif

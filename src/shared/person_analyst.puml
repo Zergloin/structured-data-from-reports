@@ -1,0 +1,4 @@
+!ifndef ISIT_SHARED_PERSON_ANALYST
+!define ISIT_SHARED_PERSON_ANALYST
+Person(analyst, "Аналитик данных", "Настраивает схемы и сравнивает результаты")
+!endif

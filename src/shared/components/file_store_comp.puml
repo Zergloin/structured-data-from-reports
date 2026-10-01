@@ -1,0 +1,1 @@
+Component(file_store_comp, "Адаптер файлов\nfile_store_comp", "Python / S3 SDK", "Оригинал и источник через S3", $tags="Инфраструктура")

@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_API__DATABASE
+!define ISIT_CONTAINER_RELATIONS_API__DATABASE
+Rel(api, database, "Выполняет SQL: версии, подтверждение и поиск", "PostgreSQL wire / TCP 5432 / TLS")
+!endif

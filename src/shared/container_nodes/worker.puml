@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_NODES_WORKER
+!define ISIT_CONTAINER_NODES_WORKER
+Container(worker, "Сервис извлечения", "Python / Celery / Docling / jsonschema", "Порции, кандидаты, проверка; повтор через outbox")
+!endif

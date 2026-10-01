@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_NODES_WEB_APP
+!define ISIT_CONTAINER_NODES_WEB_APP
+Container(web_app, "Веб-приложение", "React / TypeScript / Vite / MUI", "Формы RJSF, просмотр PDF.js, проверка и реестр")
+!endif

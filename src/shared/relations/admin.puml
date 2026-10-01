@@ -1,0 +1,4 @@
+!ifndef ISIT_RELATIONS_ADMIN
+!define ISIT_RELATIONS_ADMIN
+Rel(admin, report_system, "Назначает роли и повторно запускает неудачные задания", "HTTPS / JSON")
+!endif

@@ -1,0 +1,4 @@
+!ifndef ISIT_RELATIONS_REVIEW
+!define ISIT_RELATIONS_REVIEW
+Rel(reviewer, report_system, "Передаёт правки и решение по черновику", "HTTPS / JSON")
+!endif

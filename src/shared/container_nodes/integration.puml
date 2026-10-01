@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_NODES_INTEGRATION
+!define ISIT_CONTAINER_NODES_INTEGRATION
+Container(integration, "Обработчик интеграций", "Python / Celery / HTTPX", "Consumer integration: импорт документов и экспорт подтверждённых записей через внешние API")
+!endif

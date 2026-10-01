@@ -1,0 +1,4 @@
+!ifndef ISIT_RELATIONS_ARCHIVE
+!define ISIT_RELATIONS_ARCHIVE
+Rel(report_system, archive, "Запрашивает файлы, версии и метаданные", "HTTPS / REST / JSON, файлы")
+!endif

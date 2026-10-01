@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_WORKER__LLM
+!define ISIT_CONTAINER_RELATIONS_WORKER__LLM
+Rel(worker, llm, "Запрашивает кандидаты: порция текста и группа полей", "HTTPS / JSON")
+!endif

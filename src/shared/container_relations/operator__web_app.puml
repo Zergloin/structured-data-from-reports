@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_OPERATOR__WEB_APP
+!define ISIT_CONTAINER_RELATIONS_OPERATOR__WEB_APP
+Rel(operator, web_app, "Загружает отчёты, выбирает схему и запрашивает импорт", "Веб-интерфейс / HTTPS")
+!endif

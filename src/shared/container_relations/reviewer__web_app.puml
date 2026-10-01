@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_REVIEWER__WEB_APP
+!define ISIT_CONTAINER_RELATIONS_REVIEWER__WEB_APP
+Rel(reviewer, web_app, "Передаёт правки и решение по черновику", "Веб-интерфейс / HTTPS")
+!endif

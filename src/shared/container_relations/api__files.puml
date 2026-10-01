@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_API__FILES
+!define ISIT_CONTAINER_RELATIONS_API__FILES
+Rel(api, files, "Записывает и запрашивает оригиналы и выгрузки", "S3 API / HTTPS")
+!endif

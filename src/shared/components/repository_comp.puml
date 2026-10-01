@@ -1,0 +1,1 @@
+Component(repository_comp, "Репозиторий и транзакции\nrepository_comp", "SQLAlchemy", "Версии, права, задания и транзакции", $tags="Инфраструктура")

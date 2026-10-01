@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_WORKER__FILES
+!define ISIT_CONTAINER_RELATIONS_WORKER__FILES
+Rel(worker, files, "Запрашивает оригиналы; записывает текст и структуру", "S3 API / HTTPS")
+!endif

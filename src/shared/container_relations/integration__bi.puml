@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_INTEGRATION__BI
+!define ISIT_CONTAINER_RELATIONS_INTEGRATION__BI
+Rel(integration, bi, "Отправляет подтверждённые записи с export_id", "HTTPS / JSON")
+!endif

@@ -1,0 +1,4 @@
+!ifndef ISIT_RELATIONS_LLM
+!define ISIT_RELATIONS_LLM
+Rel(report_system, llm, "Запрашивает извлечение по тексту и схеме", "HTTPS / JSON")
+!endif

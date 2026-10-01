@@ -1,0 +1,4 @@
+!ifndef ISIT_RELATIONS_OP
+!define ISIT_RELATIONS_OP
+Rel(operator, report_system, "Загружает отчёты, выбирает схему и запрашивает импорт из архива", "HTTPS / JSON, multipart")
+!endif

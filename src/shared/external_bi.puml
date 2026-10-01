@@ -1,0 +1,4 @@
+!ifndef ISIT_EXTERNAL_BI
+!define ISIT_EXTERNAL_BI
+System_Ext(bi, "Аналитическая система", "Внешний получатель подтверждённых данных")
+!endif

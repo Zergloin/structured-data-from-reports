@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_EXTRACTION_QUEUE__WORKER
+!define ISIT_CONTAINER_RELATIONS_EXTRACTION_QUEUE__WORKER
+Rel(extraction_queue, worker, "Доставляет задание consumer: job_id; не запрос LLM", "AMQP 0-9-1 / TLS / TCP 5671")
+!endif

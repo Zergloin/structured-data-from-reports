@@ -1,0 +1,14 @@
+!include context_base.puml
+!include person_operator.puml
+!include person_reviewer.puml
+!include person_analyst.puml
+!include person_admin.puml
+!include person_consumer.puml
+!include relations/op.puml
+!include relations/review.puml
+!include relations/schema.puml
+!include relations/admin.puml
+!include relations/consume.puml
+!include relations/llm.puml
+!include relations/archive.puml
+!include relations/bi.puml

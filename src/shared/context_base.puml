@@ -1,0 +1,5 @@
+!ifndef ISIT_SHARED_CONTEXT_BASE
+!define ISIT_SHARED_CONTEXT_BASE
+System(report_system, "ИС структурированных данных", "Схемы полей, извлечение, верификация и общий реестр")
+!include external_systems.puml
+!endif

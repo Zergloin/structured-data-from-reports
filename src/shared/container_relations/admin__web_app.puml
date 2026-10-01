@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_ADMIN__WEB_APP
+!define ISIT_CONTAINER_RELATIONS_ADMIN__WEB_APP
+Rel(admin, web_app, "Назначает роли и повторно запускает неудачные задания", "Веб-интерфейс / HTTPS")
+!endif

@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_CONSUMER__WEB_APP
+!define ISIT_CONTAINER_RELATIONS_CONSUMER__WEB_APP
+Rel(consumer, web_app, "Запрашивает записи и выгрузки", "Веб-интерфейс / HTTPS")
+!endif

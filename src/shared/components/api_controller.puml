@@ -1,0 +1,1 @@
+Component(api_controller, "HTTP-контроллеры\napi_controller", "FastAPI / Pydantic", "Запросы и ответы; единый вход", $tags="Вход")

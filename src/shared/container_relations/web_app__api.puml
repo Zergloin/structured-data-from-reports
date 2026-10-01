@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_WEB_APP__API
+!define ISIT_CONTAINER_RELATIONS_WEB_APP__API
+Rel(web_app, api, "Вызывает API: файлы, схемы, правки и запросы", "HTTPS / REST / JSON, multipart")
+!endif

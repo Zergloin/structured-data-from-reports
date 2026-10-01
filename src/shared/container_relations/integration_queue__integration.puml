@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_INTEGRATION_QUEUE__INTEGRATION
+!define ISIT_CONTAINER_RELATIONS_INTEGRATION_QUEUE__INTEGRATION
+Rel(integration_queue, integration, "Доставляет задание импорта или экспорта: job_id", "AMQP 0-9-1 / TLS / TCP 5671")
+!endif

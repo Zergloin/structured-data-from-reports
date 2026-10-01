@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_RELATIONS_WORKER__DATABASE
+!define ISIT_CONTAINER_RELATIONS_WORKER__DATABASE
+Rel(worker, database, "Читает схему; сохраняет план, черновик, ошибки и outbox повтора", "PostgreSQL wire / TCP 5432 / TLS")
+!endif

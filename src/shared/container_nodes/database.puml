@@ -1,0 +1,4 @@
+!ifndef ISIT_CONTAINER_NODES_DATABASE
+!define ISIT_CONTAINER_NODES_DATABASE
+ContainerDb(database, "Общая база данных", "PostgreSQL / JSONB; pgvector - этап 2", "Схемы, версии, черновики, подтверждённые записи и история")
+!endif
