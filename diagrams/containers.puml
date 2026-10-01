@@ -1,0 +1,46 @@
+@startuml containers
+!define RELATIVE_INCLUDE
+!include vendor/C4_Container.puml
+HIDE_STEREOTYPE()
+title Общая диаграмма контейнеров (C4, уровень 2)
+
+Person(operator, "Оператор загрузки", "Загружает отчёты и следит за обработкой")
+Person(reviewer, "Эксперт-верификатор", "Сверяет поля с источником и подтверждает")
+Person(analyst, "Аналитик данных", "Создаёт схемы и сравнивает записи")
+Person(admin, "Администратор", "Управляет ролями, заданиями и интеграциями")
+Person(consumer, "Потребитель данных", "Ищет и выгружает подтверждённые записи")
+
+System_Ext(llm, "Внешний сервис языковых моделей\n(OpenRouter)", "Доступ к выбранной языковой модели")
+System_Ext(archive, "Корпоративный архив отчётов", "Внешняя система документооборота организации")
+System_Ext(bi, "Аналитическая система", "Внешний получатель подтверждённых данных")
+
+System_Boundary(report_system, "ИС структурированных данных") {
+    Container(web_app, "Веб-приложение", "React / TypeScript / Vite / MUI", "Формы RJSF, просмотр PDF.js, проверка и реестр")
+    Container(api, "Прикладной сервер", "Python / FastAPI / Pydantic / SQLAlchemy", "Пользователи, схемы, верификация, поиск; Alembic / jsonschema")
+    ContainerDb(database, "Общая база данных", "PostgreSQL / JSONB; pgvector — этап 2", "Схемы, версии, черновики, подтверждённые записи и история")
+    ContainerQueue(extraction_queue, "Очередь извлечения", "RabbitMQ / AMQP 0-9-1", "Задания разбора и извлечения")
+    Container(worker, "Обработчик документов", "Python / Celery / Docling / jsonschema", "Текст и таблицы, обращение к модели, проверка черновика")
+    ContainerDb(files, "Хранилище файлов", "Garage / S3 API", "Оригиналы, разобранные документы и выгрузки")
+    ContainerQueue(integration_queue, "Очередь интеграций", "RabbitMQ / AMQP 0-9-1", "Задания импорта и экспорта")
+    Container(integration, "Обработчик интеграций", "Python / Celery / HTTPX", "Задания импорта из архива и экспорта подтверждённых данных")
+}
+
+Rel(analyst, web_app, "Редактирует и публикует схемы; сравнивает записи", "Веб-интерфейс / HTTPS")
+Rel(web_app, api, "Передаёт файлы, правки и поисковые запросы", "HTTPS / REST / JSON, multipart")
+Rel(api, database, "Сохраняет версии и решения, выполняет поиск", "PostgreSQL / TLS")
+Rel(api, extraction_queue, "Публикует задание извлечения: job_id", "AMQP 0-9-1 / TLS")
+Rel(extraction_queue, worker, "Доставляет задание извлечения: job_id", "AMQP 0-9-1 / TLS")
+Rel(worker, database, "Запрашивает схему; записывает черновик и ошибки", "PostgreSQL / TLS")
+Rel(worker, llm, "Запрашивает извлечение значений из фрагментов по схеме", "HTTPS / JSON")
+Rel(operator, web_app, "Загружает отчёты, выбирает схему и запрашивает импорт из архива", "Веб-интерфейс / HTTPS")
+Rel(api, files, "Записывает и запрашивает оригиналы и выгрузки", "S3 API / HTTPS")
+Rel(worker, files, "Запрашивает оригиналы; записывает текст и структуру", "S3 API / HTTPS")
+Rel(reviewer, web_app, "Исправляет и подтверждает черновик", "Веб-интерфейс / HTTPS")
+Rel(consumer, web_app, "Ищет записи и выгружает результаты в CSV", "Веб-интерфейс / HTTPS")
+Rel(api, integration_queue, "Публикует задание импорта или экспорта: job_id", "AMQP 0-9-1 / TLS")
+Rel(integration_queue, integration, "Доставляет задание импорта или экспорта: job_id", "AMQP 0-9-1 / TLS")
+Rel(integration, api, "Запрашивает данные задания; передаёт импорт и результат обмена", "HTTPS / REST / JSON, multipart")
+Rel(integration, archive, "Запрашивает файлы и метаданные новых версий", "HTTPS / REST / JSON, файлы")
+Rel(integration, bi, "Передаёт подтверждённые записи", "HTTPS / JSON")
+Rel(admin, web_app, "Назначает роли и повторно запускает задания с ошибкой", "Веб-интерфейс / HTTPS")
+@enduml

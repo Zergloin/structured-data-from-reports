@@ -1,0 +1,26 @@
+@startuml local_containers_devops
+!define RELATIVE_INCLUDE
+!include vendor/C4_Container.puml
+HIDE_STEREOTYPE()
+LAYOUT_TOP_DOWN()
+title Маршрутизация фоновых заданий (C4, уровень 2)
+
+Person(admin, "Администратор", "Управляет ролями, заданиями и интеграциями")
+
+System_Boundary(report_system, "ИС структурированных данных — выбранные контейнеры") {
+    Container(web_app, "Веб-приложение", "React / TypeScript / Vite / MUI", "Формы RJSF, просмотр PDF.js, проверка и реестр")
+    Container(api, "Прикладной сервер", "Python / FastAPI / Pydantic / SQLAlchemy", "Пользователи, схемы, верификация, поиск; Alembic / jsonschema")
+    ContainerQueue(extraction_queue, "Очередь извлечения", "RabbitMQ / AMQP 0-9-1", "Задания разбора и извлечения")
+    ContainerQueue(integration_queue, "Очередь интеграций", "RabbitMQ / AMQP 0-9-1", "Задания импорта и экспорта")
+    Container(worker, "Обработчик документов", "Python / Celery / Docling / jsonschema", "Текст и таблицы, обращение к модели, проверка черновика")
+    Container(integration, "Обработчик интеграций", "Python / Celery / HTTPX", "Задания импорта из архива и экспорта подтверждённых данных")
+}
+
+Rel(admin, web_app, "Назначает роли и повторно запускает задания с ошибкой", "Веб-интерфейс / HTTPS")
+Rel(web_app, api, "Передаёт файлы, правки и поисковые запросы", "HTTPS / REST / JSON, multipart")
+Rel(api, extraction_queue, "Публикует задание извлечения: job_id", "AMQP 0-9-1 / TLS")
+Rel(api, integration_queue, "Публикует задание импорта или экспорта: job_id", "AMQP 0-9-1 / TLS")
+Rel(extraction_queue, worker, "Доставляет задание извлечения: job_id", "AMQP 0-9-1 / TLS")
+Rel(integration_queue, integration, "Доставляет задание импорта или экспорта: job_id", "AMQP 0-9-1 / TLS")
+Rel(integration, api, "Запрашивает данные задания; передаёт импорт и результат обмена", "HTTPS / REST / JSON, multipart")
+@enduml

@@ -1,0 +1,32 @@
+@startuml local_containers_teamlead
+!define RELATIVE_INCLUDE
+!include vendor/C4_Container.puml
+HIDE_STEREOTYPE()
+LAYOUT_TOP_DOWN()
+title Реестр, сравнение и внешние интеграции (C4, уровень 2)
+
+Person(consumer, "Потребитель данных", "Ищет и выгружает подтверждённые записи")
+Person(analyst, "Аналитик данных", "Создаёт схемы и сравнивает записи")
+System_Ext(archive, "Корпоративный архив отчётов", "Внешняя система документооборота организации")
+System_Ext(bi, "Аналитическая система", "Внешний получатель подтверждённых данных")
+
+System_Boundary(report_system, "ИС структурированных данных — выбранные контейнеры") {
+    Container(web_app, "Веб-приложение", "React / TypeScript / Vite / MUI", "Формы RJSF, просмотр PDF.js, проверка и реестр")
+    Container(api, "Прикладной сервер", "Python / FastAPI / Pydantic / SQLAlchemy", "Пользователи, схемы, верификация, поиск; Alembic / jsonschema")
+    ContainerDb(database, "Общая база данных", "PostgreSQL / JSONB; pgvector — этап 2", "Схемы, версии, черновики, подтверждённые записи и история")
+    ContainerDb(files, "Хранилище файлов", "Garage / S3 API", "Оригиналы, разобранные документы и выгрузки")
+    ContainerQueue(integration_queue, "Очередь интеграций", "RabbitMQ / AMQP 0-9-1", "Задания импорта и экспорта")
+    Container(integration, "Обработчик интеграций", "Python / Celery / HTTPX", "Задания импорта из архива и экспорта подтверждённых данных")
+}
+
+Rel(consumer, web_app, "Ищет записи и выгружает результаты в CSV", "Веб-интерфейс / HTTPS")
+Rel(analyst, web_app, "Редактирует и публикует схемы; сравнивает записи", "Веб-интерфейс / HTTPS")
+Rel(web_app, api, "Передаёт файлы, правки и поисковые запросы", "HTTPS / REST / JSON, multipart")
+Rel(api, database, "Сохраняет версии и решения, выполняет поиск", "PostgreSQL / TLS")
+Rel(api, files, "Записывает и запрашивает оригиналы и выгрузки", "S3 API / HTTPS")
+Rel(api, integration_queue, "Публикует задание импорта или экспорта: job_id", "AMQP 0-9-1 / TLS")
+Rel(integration_queue, integration, "Доставляет задание импорта или экспорта: job_id", "AMQP 0-9-1 / TLS")
+Rel(integration, api, "Запрашивает данные задания; передаёт импорт и результат обмена", "HTTPS / REST / JSON, multipart")
+Rel(integration, archive, "Запрашивает файлы и метаданные новых версий", "HTTPS / REST / JSON, файлы")
+Rel(integration, bi, "Передаёт подтверждённые записи", "HTTPS / JSON")
+@enduml

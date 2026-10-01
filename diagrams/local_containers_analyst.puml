@@ -1,0 +1,26 @@
+@startuml local_containers_analyst
+!define RELATIVE_INCLUDE
+!include vendor/C4_Container.puml
+HIDE_STEREOTYPE()
+LAYOUT_TOP_DOWN()
+title Публикация схем и применение ограничений (C4, уровень 2)
+
+Person(analyst, "Аналитик данных", "Создаёт схемы и сравнивает записи")
+System_Ext(llm, "Внешний сервис языковых моделей\n(OpenRouter)", "Доступ к выбранной языковой модели")
+
+System_Boundary(report_system, "ИС структурированных данных — выбранные контейнеры") {
+    Container(web_app, "Веб-приложение", "React / TypeScript / Vite / MUI", "Формы RJSF, просмотр PDF.js, проверка и реестр")
+    Container(api, "Прикладной сервер", "Python / FastAPI / Pydantic / SQLAlchemy", "Пользователи, схемы, верификация, поиск; Alembic / jsonschema")
+    ContainerDb(database, "Общая база данных", "PostgreSQL / JSONB; pgvector — этап 2", "Схемы, версии, черновики, подтверждённые записи и история")
+    ContainerQueue(extraction_queue, "Очередь извлечения", "RabbitMQ / AMQP 0-9-1", "Задания разбора и извлечения")
+    Container(worker, "Обработчик документов", "Python / Celery / Docling / jsonschema", "Текст и таблицы, обращение к модели, проверка черновика")
+}
+
+Rel(analyst, web_app, "Редактирует и публикует схемы; сравнивает записи", "Веб-интерфейс / HTTPS")
+Rel(web_app, api, "Передаёт файлы, правки и поисковые запросы", "HTTPS / REST / JSON, multipart")
+Rel(api, database, "Сохраняет версии и решения, выполняет поиск", "PostgreSQL / TLS")
+Rel(api, extraction_queue, "Публикует задание извлечения: job_id", "AMQP 0-9-1 / TLS")
+Rel(extraction_queue, worker, "Доставляет задание извлечения: job_id", "AMQP 0-9-1 / TLS")
+Rel(worker, database, "Запрашивает схему; записывает черновик и ошибки", "PostgreSQL / TLS")
+Rel(worker, llm, "Запрашивает извлечение значений из фрагментов по схеме", "HTTPS / JSON")
+@enduml

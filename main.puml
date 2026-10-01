@@ -1,0 +1,27 @@
+@startuml main
+!define RELATIVE_INCLUDE
+!include diagrams/vendor/C4_Context.puml
+HIDE_STEREOTYPE()
+LAYOUT_TOP_DOWN()
+title Мастер-диаграмма системного контекста (C4, уровень 1)
+
+System(report_system, "ИС структурированных данных", "Схемы полей, извлечение, верификация и общий реестр")
+System_Ext(llm, "Внешний сервис языковых моделей", "Доступ к выбранной языковой модели")
+System_Ext(archive, "Корпоративный архив отчётов", "Внешняя система документооборота организации")
+System_Ext(bi, "Аналитическая система", "Внешний получатель подтверждённых данных")
+
+Person(operator, "Оператор загрузки", "Загружает отчёты и следит за обработкой")
+Person(reviewer, "Эксперт-верификатор", "Сверяет поля с источником и подтверждает")
+Person(analyst, "Аналитик данных", "Создаёт схемы и сравнивает записи")
+Person(admin, "Администратор", "Управляет ролями, заданиями и интеграциями")
+Person(consumer, "Потребитель данных", "Ищет и выгружает подтверждённые записи")
+
+Rel(operator, report_system, "Загружает отчёты, выбирает схему и запрашивает импорт из архива", "HTTPS / JSON, файлы")
+Rel(reviewer, report_system, "Исправляет и подтверждает черновик", "HTTPS / JSON")
+Rel(analyst, report_system, "Публикует схемы и сравнивает записи", "HTTPS / JSON")
+Rel(admin, report_system, "Назначает роли и повторно запускает задания с ошибкой", "HTTPS / JSON")
+Rel(consumer, report_system, "Ищет записи и выгружает результаты", "HTTPS / JSON, CSV")
+Rel(report_system, llm, "Запрашивает извлечение значений из текста по схеме", "HTTPS / JSON")
+Rel(report_system, archive, "Запрашивает файлы, версии и метаданные", "HTTPS / REST / JSON, файлы")
+Rel(report_system, bi, "Отправляет подтверждённые версии записей", "HTTPS / JSON")
+@enduml
