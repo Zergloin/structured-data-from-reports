@@ -1,0 +1,15 @@
+@startuml local_containers_backend
+!include ../style.puml
+!define RELATIVE_INCLUDE
+!define ISIT_CONTAINER_VIEW
+title Загрузка, разбор и извлечение (C4, уровень 2)
+!include ../shared/person_operator.puml
+!include ../shared/external_llm.puml
+System_Boundary(report_system, "ИС структурированных данных - выбранные контейнеры") {
+!define ISIT_CONTAINER_NODES
+!include_many ../views/backend.puml
+!undef ISIT_CONTAINER_NODES
+}
+!include_many ../views/backend.puml
+footer HTTP/SQL/S3: инициатор запроса → сервис. AMQP: отправитель → получатель сообщения.\nОтветы, подписка и ACK опущены. Показана только выбранная часть общей архитектуры.
+@enduml
