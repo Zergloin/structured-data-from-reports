@@ -1,0 +1,1 @@
+Component(worker_file_store_comp, "Адаптер файлов обработчика\nworker_file_store_comp", "Python / S3 SDK", "Оригинал и артефакты через S3", $tags="Инфраструктура")

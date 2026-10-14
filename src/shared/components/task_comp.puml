@@ -1,0 +1,1 @@
+Component(task_comp, "Вход задачи Celery\ntask_comp", "Python / Celery", "Приём команды; поздний ACK", $tags="Вход")
