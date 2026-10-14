@@ -1,0 +1,32 @@
+@startuml integrations_components
+!include ../style.puml
+!define RELATIVE_INCLUDE
+!define ISIT_CONTAINER_VIEW
+title Приём команд и внешний обмен\nC4: компоненты контейнера integration
+!include ../shared/container_nodes/api.puml
+!include ../shared/external_archive.puml
+!include ../shared/external_bi.puml
+!include ../shared/container_nodes/integration_queue.puml
+Container_Boundary(integration, "integration: компоненты одного процесса") {
+Boundary(integration_layer_0, "Вход") {
+!include ../shared/components/int_consumer.puml
+}
+Boundary(integration_layer_1, "Прикладная логика") {
+!include ../shared/components/int_flow.puml
+}
+Boundary(integration_layer_3, "Инфраструктура") {
+!include ../shared/components/int_api.puml
+!include ../shared/components/int_archive.puml
+!include ../shared/components/int_analytics.puml
+}
+}
+Rel(int_consumer, int_flow, "D01: Передаёт команду импорта или экспорта", "Python Call")
+Rel(int_flow, int_api, "D02: Запрашивает задание и фиксирует результат", "Python Call")
+Rel(int_flow, int_archive, "D03: Запрашивает внешнюю версию отчёта", "Python Call")
+Rel(int_flow, int_analytics, "D04: Передаёт снимок и ключ доставки", "Python Call")
+Rel(integration_queue, int_consumer, "N11: Доставляет команду интеграции с job_id", "AMQP / Celery JSON")
+Rel(int_api, api, "N13: api_controller: Получает задание; регистрирует импорт и исход", "HTTPS / JSON, multipart")
+Rel(int_archive, archive, "N14: Запрашивает файл и метаданные версии", "HTTPS / REST")
+Rel(int_analytics, bi, "N15: Отправляет подтверждённые записи и идентификатор выгрузки", "HTTPS / JSON")
+footer Стрелка: инициатор → получатель; ответы опущены. AMQP обозначает доставку команды.\nПовторы обоих обработчиков публикует dispatch_comp API через outbox.
+@enduml
