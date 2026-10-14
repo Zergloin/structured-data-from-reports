@@ -1,0 +1,1 @@
+Component(web_rules, "Правила формы\nweb_rules", "TypeScript / JSON Schema", "Проверка формы и команд", $tags="Предметная логика")

@@ -1,0 +1,1 @@
+Component(validation_comp, "Проверка значений\nvalidation_comp", "Python / jsonschema", "Правила сохранения и подтверждения", $tags="Предметная логика")
