@@ -1,0 +1,100 @@
+@startuml comparison_code
+!include ../style.puml
+title Диаграмма классов UML (Level 4) - comparison_comp
+' Сравнение и Strategy
+together {
+class RecordComparator {
+  -_strategy: ComparisonStrategy
+  --
+  +__init__(strategy: ComparisonStrategy): None
+  +set_strategy(strategy: ComparisonStrategy): None
+  +compare(records: tuple[ConfirmedRecord, ...]\n    ): ComparisonResult
+}
+interface ComparisonStrategy <<interface>> {
+  --
+  +equivalent(left: JsonValue, right: JsonValue, \n      kind: FieldKind): bool
+}
+class ExactComparisonStrategy {
+  --
+  +equivalent(left: JsonValue, right: JsonValue, \n      kind: FieldKind): bool
+}
+class NumericToleranceStrategy {
+  -_absolute: float
+  -_relative: float
+  --
+  +__init__(absolute: float, relative: float = 0.0\n    ): None
+  +equivalent(left: JsonValue, right: JsonValue, \n      kind: FieldKind): bool
+}
+}
+' Подтверждённые входы и схема
+together {
+class ConfirmedRecord <<frozen>> {
+  +version_id: str
+  +document_version_id: str
+  +schema: SchemaDefinition
+  +values_json: str
+  +confirmed: bool = True
+  +values: dict[str, JsonValue] {readOnly}
+  --
+}
+class SchemaDefinition <<frozen>> {
+  +schema_id: str
+  +revision: int
+  +schema_json: str
+  +fields: tuple[FieldDefinition, ...]
+  +version_id: str | None = None
+  +schema: dict[str, JsonValue] {readOnly}
+  --
+}
+class FieldDefinition <<frozen>> {
+  +key: str
+  +semantic_id: str
+  +kind: FieldKind
+  +description: str = ''
+  +unit: str | None = None
+  --
+}
+enum FieldKind {
+  STRING = 'string'
+  INTEGER = 'integer'
+  NUMBER = 'number'
+  BOOLEAN = 'boolean'
+}
+}
+' Результат сопоставления
+together {
+class ComparisonResult <<frozen>> {
+  +version_ids: tuple[str, ...]
+  +fields: tuple[FieldComparison, ...]
+  --
+}
+class FieldComparison <<frozen>> {
+  +semantic_id: str
+  +status: str
+  +values: tuple[JsonValue, ...]
+  --
+}
+}
+ComparisonResult "0..*" --> "0..*" FieldComparison : fields
+ComparisonStrategy ..> FieldKind : equivalent: вход
+ConfirmedRecord "0..*" --> "1" SchemaDefinition : schema
+FieldDefinition "0..*" --> "1" FieldKind : kind
+RecordComparator "0..*" --> "1" ComparisonStrategy : _strategy
+RecordComparator ..> ComparisonResult : compare: результат
+RecordComparator ..> ConfirmedRecord : compare: вход
+SchemaDefinition "0..*" --> "0..*" FieldDefinition : fields
+ComparisonStrategy <|.. ExactComparisonStrategy
+ComparisonStrategy <|.. NumericToleranceStrategy
+NumericToleranceStrategy ..> ExactComparisonStrategy : equivalent: точное сравнение нечисловых\n    значений
+ExactComparisonStrategy -[hidden]right-> NumericToleranceStrategy
+' Условия приведены текстом в индивидуальном отчёте.
+' RecordComparator:
+' Не менее двух разных подтверждённых версий.
+' Поля сопоставляются по semantic_id.
+' Тип и единица проверяются до стратегии.
+' При допуске проверяются все пары значений.
+' FieldComparison:
+' status: equal, different, missing, incompatible.
+' Пропуск не подменяется нулём.
+' values сохраняет порядок входных версий.
+@enduml
