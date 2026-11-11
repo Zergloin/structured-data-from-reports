@@ -1,0 +1,24 @@
+@startuml dynamic_teamlead
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Тимлид: Сопоставление принятых версий и согласование сквозного процесса
+Person(consumer, "Потребитель", "Пользовательская роль")
+Container_Boundary(api_boundary, "api: существующий контейнер") {
+Component(api_controller, "HTTP-контроллеры\napi_controller", "FastAPI / Pydantic", "Принимает запросы веб-клиента и сервисного клиента, проверяет их структуру и вызывает прикладные операции")
+Component(registry_comp, "Реестр записей\nregistry_comp", "Python", "Поиск, фильтры и получение подтверждённых версий; координация сравнения.")
+Component(repository_comp, "Репозиторий и транзакции\nrepository_comp", "SQLAlchemy", "Согласованные транзакции версий, прав, заданий, outbox и истории; контроль ревизий и попыток.")
+Component(comparison_comp, "Сравнение значений\ncomparison_comp", "Python", "Сопоставляет записи по смысловому ID поля, типу и единицам; отмечает несовместимость.")
+}
+ContainerDb(database, "Общая БД", "PostgreSQL", "Версии и транзакции")
+Rel(consumer, api_controller, "1. Запрашивает сравнение выбранных версий", "HTTPS / JSON")
+Rel(api_controller, registry_comp, "2. Передает запрос после проверки доступа", "Python call")
+Rel(registry_comp, repository_comp, "3. Загружает только доступные ConfirmedRecord", "Python call")
+Rel(repository_comp, database, "4. Читает неизменяемые версии и определения полей", "SQL / TLS")
+Rel(registry_comp, comparison_comp, "5. RecordComparator.compare(records)", "Python call")
+Rel(comparison_comp, comparison_comp, "6. Проверяет semantic_id, тип, единицу; вызывает equivalent", "Python call")
+Rel(registry_comp, api_controller, "7. Возвращает различия и причины несовместимости", "Python return")
+footer
+api - граница развертывания. Классы Strategy не являются отдельными сервисами.
+Номера - хронология данного локального сценария; ответы без изменения состояния сокращены.
+endfooter
+@enduml

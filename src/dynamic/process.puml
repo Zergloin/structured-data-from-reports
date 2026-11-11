@@ -1,0 +1,68 @@
+@startuml dynamic_extraction
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Динамическая диаграмма C4: Прием отчета и извлечение - лист 1 из 2
+Boundary(runtime_frame_1, "Фрейм 1. Прием отчета и извлечение", "Взаимодействие во время выполнения") {
+Person(operator, "Оператор", "Выбирает отчет и схему")
+Container(web_app, "Веб-приложение\nweb_app", "React / TypeScript", "Действия пользователя")
+Container(api, "Прикладной сервер\napi", "FastAPI / Python", "Версии, права, реестр и outbox")
+ContainerQueue(extraction_queue, "Очередь извлечения\nextraction_queue", "RabbitMQ", "Команда с job_id")
+Container(worker, "Сервис извлечения\nworker", "Celery / Docling / HTTPX", "Разбор, порции и кандидаты")
+ContainerDb(files, "Хранилище файлов\nfiles", "Garage / S3", "Оригинал и фрагменты")
+ContainerDb(database, "Общая база данных\ndatabase", "PostgreSQL", "Версии, задания и решения")
+System_Ext(llm, "Сервис языковых моделей\nllm", "OpenRouter; кандидаты значений")
+}
+Rel(operator, web_app, "1. Выбирает отчет\nи схему", "GUI")
+Rel(web_app, api, "2. Передает отчет\nна обработку", "HTTPS / multipart + JSON")
+Rel(api, files, "3. Сохраняет\nоригинал", "S3 / HTTPS")
+Rel(api, database, "4. Создает документ,\nзадание и outbox", "SQL / TLS")
+Rel(api, extraction_queue, "5. extract_document.v1\n(job_id)", "AMQPS; publisher confirm")
+Rel(extraction_queue, worker, "6. Доставляет\njob_id", "AMQPS / Celery JSON")
+Rel(worker, database, "7. Получает lease,\nсхему и checkpoints", "SQL / TLS")
+Rel(worker, files, "8. Читает оригинал;\nсохраняет фрагменты", "S3 / HTTPS")
+Rel(worker, database, "9. Сохраняет план\nи fingerprint", "SQL / TLS")
+Rel(worker, llm, "10. ModelPort.extract\n(unit)", "HTTPS / JSON")
+Rel(worker, database, "11. Сохраняет\ncheckpoint", "SQL / TLS")
+Rel(worker, database, "12. Сохраняет черновик;\nsucceeded", "SQL / TLS")
+Rel(worker, extraction_queue, "13. ACK после\nфиксации исхода", "AMQPS")
+Rel(web_app, api, "14. Запрашивает\nпрогресс и черновик", "HTTPS / JSON")
+Rel(api, database, "15. Читает результат\nзадания", "SQL / TLS")
+footer
+Шаги 10-11 повторяются для каждой незавершенной порции. Шаг 12 - после полного покрытия.
+Номера стрелок определяют порядок; рамка объединяет участников сценария.
+endfooter
+@enduml
+
+@startuml dynamic_confirmation_export
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Динамическая диаграмма C4: Принятие записи и внешний экспорт - лист 2 из 2
+Boundary(runtime_frame_2, "Фрейм 2. Принятие записи и внешний экспорт", "Взаимодействие во время выполнения") {
+Person(reviewer, "Эксперт", "Проверяет значения и основания")
+Person(consumer, "Потребитель", "Выбирает принятый набор")
+Container(web_app, "Веб-приложение\nweb_app", "React / TypeScript", "Действия пользователя")
+Container(api, "Прикладной сервер\napi", "FastAPI / Python", "Версии, права, реестр и outbox")
+ContainerQueue(integration_queue, "Очередь интеграций\nintegration_queue", "RabbitMQ", "Команда с job_id")
+Container(integration, "Обработчик интеграций\nintegration", "Celery / HTTPX", "Обмен через SystemApi")
+ContainerDb(database, "Общая база данных\ndatabase", "PostgreSQL", "Версии, задания и решения")
+System_Ext(bi, "Аналитическая система\nbi", "Получатель принятого снимка")
+}
+Rel(reviewer, web_app, "16. Сверяет значения\nс источниками", "GUI")
+Rel(web_app, api, "17. Запрашивает\nподтверждение", "HTTPS / JSON + expected_revision")
+Rel(api, database, "18. Фиксирует принятую\nверсию r1", "SQL / TLS")
+Rel(consumer, web_app, "19. Выбирает принятый\nнабор данных", "GUI")
+Rel(web_app, api, "20. Запрашивает\nэкспорт", "HTTPS / JSON")
+Rel(api, database, "21. Фиксирует export_id,\nзадание и outbox", "SQL / TLS")
+Rel(api, integration_queue, "22. integration.v1\n(job_id)", "AMQPS; publisher confirm")
+Rel(integration_queue, integration, "23. IntegrationContext\n.process(job_id)", "AMQPS / Celery JSON")
+Rel(integration, api, "24. SystemApi.claim", "HTTPS / JSON")
+Rel(integration, api, "25. SystemApi\n.delivery_started", "HTTPS / JSON")
+Rel(integration, bi, "26. AnalyticsPort.send\n(export_id, records)", "HTTPS / JSON; export_id")
+Rel(integration, api, "27. SystemApi.finish", "HTTPS / JSON")
+Rel(api, database, "28. Фиксирует исход\nс проверкой lease", "SQL / TLS")
+Rel(integration, integration_queue, "29. ACK после\nфиксации в API", "AMQPS")
+footer
+Шаг 18 выполняется атомарно; export_id закрепляет состав снимка.
+ACK в шаге 29 разрешен после устойчивой фиксации исхода в API.
+endfooter
+@enduml

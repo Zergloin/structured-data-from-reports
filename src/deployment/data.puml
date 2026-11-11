@@ -1,0 +1,35 @@
+@startuml deployment_data
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Развертывание: данные, очередь и репликация
+
+Deployment_Node(data_a, "DATA-A / зона отказа A", "Отдельная Linux VM; persistent volumes") {
+ ContainerDb(database_primary, "database / primary", "PostgreSQL", "Запись API и worker; backup + WAL")
+ ContainerQueue(rabbit_a, "RabbitMQ / член A", "Обе очереди", "extraction_queue, integration_queue; quorum")
+ Node(s3_tls_a, "TLS-proxy S3", "Nginx на узле", ":443 → 127.0.0.1:3900")
+ ContainerDb(files_a, "files / Garage A", "Garage / S3", "Реплика данных и метаданных; factor=3")
+}
+Deployment_Node(data_b, "DATA-B / зона отказа B", "Отдельная Linux VM; persistent volumes") {
+ ContainerDb(database_standby, "database / standby", "PostgreSQL", "Асинхронная реплика; ручное продвижение")
+ ContainerQueue(rabbit_b, "RabbitMQ / член B", "Обе очереди", "Второй член каждой quorum-очереди")
+ Node(s3_tls_b, "TLS-proxy S3", "Nginx на узле", ":443 → 127.0.0.1:3900")
+ ContainerDb(files_b, "files / Garage B", "Garage / S3", "Отдельные диски и метаданные")
+}
+Deployment_Node(data_c, "DATA-C / зона отказа C", "Отдельная Linux VM; persistent volumes") {
+ ContainerQueue(rabbit_c, "RabbitMQ / член C", "Обе очереди", "Третий член каждой quorum-очереди")
+ Node(s3_tls_c, "TLS-proxy S3", "Nginx на узле", ":443 → 127.0.0.1:3900")
+ ContainerDb(files_c, "files / Garage C", "Garage / S3", "Отдельные диски и метаданные")
+}
+Rel(database_primary, database_standby, "Асинхронный WAL", "PostgreSQL :5432 / TLS")
+Rel(rabbit_a, rabbit_b, "Репликация quorum", "Erlang :25672 / TLS")
+Rel(rabbit_b, rabbit_c, "Репликация quorum", "Erlang :25672 / TLS")
+Rel(rabbit_a, rabbit_c, "Репликация quorum", "Erlang :25672 / TLS")
+Rel(files_a, files_b, "Репликация и метаданные", "Garage RPC :3901")
+Rel(files_b, files_c, "Репликация и метаданные", "Garage RPC :3901")
+Rel(files_a, files_c, "Репликация и метаданные", "Garage RPC :3901")
+footer
+Входы от APP: PostgreSQL TLS :5432, AMQPS :5671, S3 HTTPS :443 через TLS-proxy узла.
+Garage S3 :3900 доступен proxy только по loopback. RPC :3901 закрыт allowlist и rpc_secret.
+Реплики не заменяют backup. При потере PG primary допускается потеря последних WAL; failover ручной.
+endfooter
+@enduml

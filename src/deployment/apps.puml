@@ -1,0 +1,38 @@
+@startuml deployment_apps
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Развертывание: клиент, вход и два узла приложения
+
+Deployment_Node(client, "Рабочее место", "Браузер") {
+ Container(web_app_1, "web_app / экземпляр клиента", "React / TypeScript", "Код выполняется в браузере")
+}
+Deployment_Node(edge, "EDGE - входная VM", "Linux / Docker") {
+ Container(edge_proxy, "Reverse Proxy", "Nginx", "Статические файлы web_app, TLS и балансировка API")
+}
+Deployment_Node(app_a, "APP-A", "Linux / Docker; независимая VM") {
+ Container(api_a, "api #1", "FastAPI / Python", "HTTP API и dispatch_comp")
+ Container(worker_a, "worker #1", "Celery / Docling", "Consumer extraction")
+ Container(integration_a, "integration #1", "Celery / HTTPX", "Consumer integration; только API")
+}
+Deployment_Node(app_b, "APP-B", "Linux / Docker; независимая VM") {
+ Container(api_b, "api #2", "FastAPI / Python", "Те же контракты; общая БД")
+ Container(worker_b, "worker #2", "Celery / Docling", "Другие задания; lease")
+ Container(integration_b, "integration #2", "Celery / HTTPX", "Другие задания; lease")
+}
+Deployment_Node(data_refs, "DATA-A/B/C - подробнее на следующем листе", "Конечные точки закрытого сегмента") {
+ ContainerDb(ref_database, "database endpoint", "PostgreSQL", "primary DATA-A; standby DATA-B")
+ ContainerQueue(ref_queues, "extraction_queue + integration_queue", "Один RabbitMQ", "Три quorum-члена на DATA-A/B/C")
+ ContainerDb(ref_files, "files endpoint", "S3 HTTPS", "TLS-proxy и Garage на DATA-A/B/C")
+}
+Rel(app_a, data_refs, "Соединения по матрице доступа", "PG TLS :5432; AMQPS :5671; S3 HTTPS :443")
+Rel(app_b, data_refs, "Соединения по матрице доступа", "PG TLS :5432; AMQPS :5671; S3 HTTPS :443")
+Rel(web_app_1, edge_proxy, "Файлы и команды", "HTTPS :443 / TLS")
+Rel(edge_proxy, api_a, "Балансировка и readiness", "HTTPS :8000 / TLS")
+Rel(edge_proxy, api_b, "Балансировка и readiness", "HTTPS :8000 / TLS")
+Rel(integration_a, edge_proxy, "SystemApi: задание, исход, повтор", "HTTPS :443")
+Rel(integration_b, edge_proxy, "SystemApi: задание, исход, повтор", "HTTPS :443")
+footer
+Все экземпляры привязаны к тем же L2 ID. Ресурсы узлов требуют нагрузочного расчета.
+Данные и очереди размещены на отдельном листе deployment_data. EDGE - явная точка отказа.
+endfooter
+@enduml
