@@ -1,0 +1,57 @@
+@startuml api_components
+!include ../style.puml
+!define RELATIVE_INCLUDE
+!define ISIT_CONTAINER_VIEW
+title Прикладной сервер: согласованная компонентная модель\nC4: компоненты контейнера api
+!include ../shared/container_nodes/database.puml
+!include ../shared/container_nodes/extraction_queue.puml
+!include ../shared/container_nodes/files.puml
+!include ../shared/container_nodes/integration.puml
+!include ../shared/container_nodes/integration_queue.puml
+!include ../shared/container_nodes/web_app.puml
+Container_Boundary(api, "api: компоненты одного процесса") {
+!include ../shared/components/api_controller.puml
+!include ../shared/components/auth_comp.puml
+!include ../shared/components/registry_comp.puml
+!include ../shared/components/export_comp.puml
+!include ../shared/components/schema_comp.puml
+!include ../shared/components/document_comp.puml
+!include ../shared/components/job_comp.puml
+!include ../shared/components/review_comp.puml
+!include ../shared/components/comparison_comp.puml
+!include ../shared/components/schema_validation_comp.puml
+!include ../shared/components/validation_comp.puml
+!include ../shared/components/repository_comp.puml
+!include ../shared/components/dispatch_comp.puml
+!include ../shared/components/file_store_comp.puml
+}
+Rel(api_controller, auth_comp, "A01: Проверяет действие и объект", "Python Call")
+Rel(auth_comp, repository_comp, "A02: Читает пользователя и права", "Python Call")
+Rel(api_controller, registry_comp, "T01: Передаёт фильтры или ID записей", "Python Call")
+Rel(registry_comp, repository_comp, "T02: Читает подтверждённые версии", "Python Call")
+Rel(registry_comp, comparison_comp, "T03: Передаёт значения и определения полей", "Python Call")
+Rel(api_controller, export_comp, "T04: Запрашивает выгрузку выбранных версий", "Python Call")
+Rel(export_comp, repository_comp, "T05: Фиксирует снимок экспорта", "Python Call")
+Rel(dispatch_comp, repository_comp, "T06: Захватывает событие и отмечает публикацию", "Python Call")
+Rel(api_controller, schema_comp, "S01: Передаёт команду изменения схемы", "Python Call")
+Rel(schema_comp, schema_validation_comp, "S02: Проверяет описание и ограничения", "Python Call")
+Rel(schema_comp, repository_comp, "S03: Сохраняет черновик или новую версию", "Python Call")
+Rel(api_controller, document_comp, "B01: Принимает документ и выбранную схему", "Python Call")
+Rel(document_comp, file_store_comp, "B02: Сохраняет оригинал документа", "Python Call")
+Rel(document_comp, repository_comp, "B03: Регистрирует версию в общей транзакции", "Python Call")
+Rel(document_comp, job_comp, "B04: Создаёт задание для версии", "Python Call")
+Rel(api_controller, job_comp, "B05: Запрашивает состояние, попытку и повтор", "Python Call")
+Rel(job_comp, repository_comp, "B06: Согласует состояние и команды заданий", "Python Call")
+Rel(api_controller, review_comp, "B07: Передаёт правки и решение", "Python Call")
+Rel(review_comp, validation_comp, "B08: Проверяет значения по схеме", "Python Call")
+Rel(review_comp, repository_comp, "B09: Сохраняет правки, ревизию и решение", "Python Call")
+Rel(api_controller, file_store_comp, "B10: Получает оригинал для проверки", "Python Call")
+Rel(export_comp, job_comp, "T07: Создаёт задание внешней выгрузки", "Python Call")
+Rel(web_app, api_controller, "N01: Передаёт данные пользовательских операций", "HTTPS / JSON, multipart")
+Rel(repository_comp, database, "N02: Читает и записывает версии, права и задания", "SQL / PostgreSQL")
+Rel(dispatch_comp, integration_queue, "N03: Публикует команду интеграции с job_id", "AMQP / Celery JSON")
+Rel(integration, api_controller, "N04: Запрашивает задание, снимок и фиксацию исхода", "HTTPS / JSON, multipart")
+Rel(file_store_comp, files, "N16: Записывает оригинал и читает источник", "S3 API / HTTPS")
+Rel(dispatch_comp, extraction_queue, "N17: Публикует команду извлечения с job_id", "AMQP / Celery JSON")
+footer Стрелка: инициатор → получатель; ответы опущены. AMQP обозначает доставку команды.\nПовторы обоих обработчиков публикует dispatch_comp API через outbox.
+@enduml

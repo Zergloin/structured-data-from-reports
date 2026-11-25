@@ -1,0 +1,27 @@
+@startuml main
+!include style.puml
+!define RELATIVE_INCLUDE
+!define ISIT_CONTAINER_VIEW
+title Общая диаграмма контейнеров (C4, уровень 2)
+!include shared/person_operator.puml
+!include shared/person_reviewer.puml
+!include shared/person_analyst.puml
+!include shared/person_admin.puml
+!include shared/person_consumer.puml
+!include shared/external_systems.puml
+System_Boundary(report_system, "ИС структурированных данных") {
+!define ISIT_CONTAINER_NODES
+!include_many views/analyst.puml
+!include_many views/backend.puml
+!include_many views/techdoc.puml
+!include_many views/teamlead.puml
+!include_many views/devops.puml
+!undef ISIT_CONTAINER_NODES
+}
+!include_many views/analyst.puml
+!include_many views/backend.puml
+!include_many views/techdoc.puml
+!include_many views/teamlead.puml
+!include_many views/devops.puml
+footer Стрелки показывают обращения к сервисам и передачу заданий через очереди.\nОбе очереди работают в одном RabbitMQ.
+@enduml
