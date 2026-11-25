@@ -1,0 +1,13 @@
+@startuml context_devops
+!include ../style.puml
+title Контекст: DevOps-инженер
+!include ../shared/context_base.puml
+!include ../shared/person_admin.puml
+!include ../shared/relations/admin.puml
+!include ../shared/person_consumer.puml
+!include ../shared/relations/consume.puml
+!include ../shared/relations/archive.puml
+!include ../shared/relations/bi.puml
+!include ../shared/relations/llm.puml
+footer Фокус участника; идентификаторы взяты из общего контекста.
+@enduml

@@ -1,0 +1,12 @@
+services:
+  plantuml:
+    image: plantuml/plantuml-server@sha256:3719f4a9b0b061f1aa42d14d130388f831954ca65685d521b6c5b72301e993e6
+    ports:
+      - "127.0.0.1:18080:8080"
+    volumes:
+      - ./src:/workspace/src:ro
+    environment:
+      PLANTUML_SECURITY_PROFILE: INTERNET
+      PLANTUML_SECURITY_ALLOWLIST_PATH: /workspace/src
+      PLANTUML_INCLUDE_PATH: /workspace/src
+    restart: "no"

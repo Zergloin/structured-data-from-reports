@@ -1,0 +1,31 @@
+@startuml deployment_devops
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Локальное развертывание: DevOps / integration
+Deployment_Node(broker_nodes, "DATA-A/B/C", "Те же три узла RabbitMQ") {
+ ContainerQueue(integration_queue_cluster, "integration_queue", "Quorum 3", "Сообщение job_id; manual ACK")
+}
+Deployment_Node(edge, "EDGE", "Nginx / API endpoint") {
+ Node(api_endpoint, "SystemApi endpoint", "HTTPS :443", "Прокси к api на APP-A/B по TLS :8000")
+}
+System_Ext(archive, "Корпоративный архив", "Версии документов")
+System_Ext(bi, "Аналитическая система", "Принятый снимок; export_id")
+Deployment_Node(app_a, "APP-A", "Linux VM / Docker") {
+ Container(integration_a, "integration #1", "Celery / HTTPX", "IntegrationContext и внешние адаптеры; без доступа к БД")
+}
+Rel(integration_queue_cluster, integration_a, "Команда job_id; ACK после API", "AMQPS :5671")
+Rel(integration_a, api_endpoint, "claim, finish, schedule_retry", "HTTPS :443")
+Rel(integration_a, archive, "Импорт версии", "HTTPS :443 / REST")
+Rel(integration_a, bi, "send / status по export_id", "HTTPS :443 / JSON")
+Deployment_Node(app_b, "APP-B", "Linux VM / Docker") {
+ Container(integration_b, "integration #2", "Celery / HTTPX", "IntegrationContext и внешние адаптеры; без доступа к БД")
+}
+Rel(integration_queue_cluster, integration_b, "Команда job_id; ACK после API", "AMQPS :5671")
+Rel(integration_b, api_endpoint, "claim, finish, schedule_retry", "HTTPS :443")
+Rel(integration_b, archive, "Импорт версии", "HTTPS :443 / REST")
+Rel(integration_b, bi, "send / status по export_id", "HTTPS :443 / JSON")
+footer
+Сегмент общей топологии, без новых VM или контейнеров. Показаны стыки выбранной ответственности.
+Полная репликация и остальные соединения приведены на общих листах развертывания.
+endfooter
+@enduml

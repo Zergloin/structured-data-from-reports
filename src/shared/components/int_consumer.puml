@@ -1,0 +1,1 @@
+Component(int_consumer, "Приёмник интеграций\nint_consumer", "Celery task", "Приём команды; ACK после фиксации", $tags="Вход")

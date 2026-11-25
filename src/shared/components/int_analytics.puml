@@ -1,0 +1,1 @@
+Component(int_analytics, "Адаптер аналитики\nint_analytics", "HTTPX", "Доставка снимка и проверка исхода", $tags="Инфраструктура")

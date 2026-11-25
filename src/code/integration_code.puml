@@ -1,0 +1,127 @@
+@startuml integration_code
+!include ../style.puml
+title Диаграмма классов UML (Level 4) - int_flow
+' Управление попыткой
+together {
+class IntegrationContext {
+  -_strategy: IntegrationStrategy
+  -_api: SystemApi
+  -_max_attempts: int
+  --
+  +__init__(strategy: IntegrationStrategy, api: SystemApi, \n      max_attempts: int = 3): None
+  +set_strategy(strategy: IntegrationStrategy): None
+  +process(job_id: str): ProcessingResult
+}
+interface IntegrationStrategy <<interface>> {
+  +operation: str {readOnly}
+  --
+  +execute(lease: ExecutionLease, api: SystemApi): str
+}
+class ImportStrategy {
+  -_archive: ArchivePort
+  +operation: str {readOnly}
+  --
+  +__init__(archive: ArchivePort): None
+  +execute(lease: ExecutionLease, api: SystemApi): str
+}
+class ExportStrategy {
+  -_analytics: AnalyticsPort
+  +operation: str {readOnly}
+  --
+  +__init__(analytics: AnalyticsPort): None
+  +execute(lease: ExecutionLease, api: SystemApi): str
+}
+}
+' Порты обмена
+together {
+interface SystemApi <<interface>> {
+  --
+  +claim(job_id: str, operation: str): ExecutionLease
+  +register_import(lease: ExecutionLease, \n      document: ExternalDocument): str
+  +delivery_started(lease: ExecutionLease, export_id: str\n    ): bool
+  +finish(lease: ExecutionLease, state: str, detail: str\n    ): None
+  +schedule_retry(lease: ExecutionLease, detail: str\n    ): None
+}
+interface ArchivePort <<interface>> {
+  --
+  +fetch(external_id: str, version: str\n    ): ExternalDocument
+}
+interface AnalyticsPort <<interface>> {
+  +supports_idempotency: bool {readOnly}
+  --
+  +status(export_id: str): str
+  +send(export_id: str, \n      records: tuple[ConfirmedRecord, ...]): None
+}
+}
+' Задание и исход
+together {
+class ImportRequest <<frozen>> {
+  +job_id: str
+  +external_id: str
+  +external_version: str
+  +schema_version: str | None = None
+  --
+}
+class ExportRequest <<frozen>> {
+  +job_id: str
+  +export_id: str
+  +records: tuple[ConfirmedRecord, ...]
+  --
+}
+class ExecutionLease <<frozen>> {
+  +request: IntegrationRequest
+  +attempt: int
+  +token: int
+  +terminal_state: str | None = None
+  --
+}
+class ProcessingResult <<frozen>> {
+  +state: str
+  +ack: bool
+  +detail: str
+  --
+}
+class RetryableError <<exception>> {
+  --
+}
+class ManualReconciliation <<exception>> {
+  --
+}
+}
+ExecutionLease "0..*" --> "0..1" ExportRequest : request (export)
+ExecutionLease "0..*" --> "0..1" ImportRequest : request (import)
+ExportStrategy "0..*" --> "1" AnalyticsPort : _analytics
+ImportStrategy "0..*" --> "1" ArchivePort : _archive
+IntegrationContext "0..*" --> "1" IntegrationStrategy : _strategy
+IntegrationContext "0..*" --> "1" SystemApi : _api
+IntegrationContext ..> ProcessingResult : process: результат
+IntegrationStrategy ..> ExecutionLease : execute: вход
+IntegrationStrategy ..> SystemApi : execute: вход
+SystemApi ..> ExecutionLease : параметры и результаты
+IntegrationStrategy <|.. ImportStrategy
+IntegrationStrategy <|.. ExportStrategy
+IntegrationContext ..> RetryableError : process: ограниченный повтор
+IntegrationContext ..> ManualReconciliation : process: ручное согласование
+ExportStrategy ..> RetryableError : execute: безопасный повтор
+ExportStrategy ..> ManualReconciliation : execute: неизвестный исход
+ImportStrategy -[hidden]right-> ExportStrategy
+' Условия приведены текстом в индивидуальном отчёте.
+' IntegrationContext:
+' process получает только job_id.
+' Данные задания загружаются через claim.
+' Повтор назначается через API, затем разрешён ACK.
+' Недоступность API даёт ack=false.
+' ExecutionLease:
+' IntegrationRequest = ImportRequest | ExportRequest.
+' request содержит ровно одну из двух альтернатив.
+' attempt ограничивает повторы; token защищает
+' от фиксации исхода устаревшим исполнителем.
+' ExportStrategy:
+' Намерение доставки фиксируется до send.
+' После неизвестного исхода нужен статус
+' или идемпотентность; иначе ManualReconciliation.
+' ProcessingResult:
+' state: succeeded, failed, manual,
+' retry_scheduled, unavailable.
+' Технический исход не подтверждает данные человеком.
+@enduml

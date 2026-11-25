@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "role": "devops",
+  "lab": 5,
+  "required_files": [
+    "ci/contracts/devops.json",
+    "ci/preview.py",
+    "compose.yaml",
+    "docs/local-preview.md",
+    "docs/review/devops.md",
+    "prototype/src/report_components/integrations.py",
+    "prototype/tests/test_integrations.py",
+    "src/code/integration_api_code.puml",
+    "src/code/integration_code.puml",
+    "src/components/integrations_components.puml",
+    "src/containers/devops.puml",
+    "src/context/devops.puml",
+    "src/deployment/devops.puml",
+    "src/dynamic/devops.puml",
+    "src/landscape/devops.puml",
+    "src/shared/components/int_analytics.puml",
+    "src/shared/components/int_api.puml",
+    "src/shared/components/int_archive.puml",
+    "src/shared/components/int_consumer.puml",
+    "src/shared/components/int_flow.puml",
+    "src/views/devops.puml"
+  ]
+}
