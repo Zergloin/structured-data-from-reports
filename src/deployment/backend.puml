@@ -1,0 +1,31 @@
+@startuml deployment_backend
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Локальное развертывание: Backend / worker
+Deployment_Node(broker_nodes, "DATA-A/B/C", "Те же три узла RabbitMQ") {
+ ContainerQueue(extraction_queue_cluster, "extraction_queue", "Quorum 3", "Вторая integration_queue здесь не раскрыта")
+}
+Deployment_Node(data_refs, "DATA-A/B/C", "Конечные точки хранения") {
+ ContainerDb(database_primary, "database / primary", "PostgreSQL", "Standby на DATA-B; тот же кластер")
+ ContainerDb(files_cluster, "files", "Garage / factor=3", "S3 ingress :443; TLS-proxy на каждом узле")
+}
+System_Ext(llm, "Сервис моделей", "OpenRouter; фрагменты и схема")
+Deployment_Node(app_a, "APP-A", "Linux VM / Docker") {
+ Container(worker_a, "worker #1", "Celery / Docling / HTTPX", "Семь компонентов; ExtractionContext, порции и checkpoints")
+}
+Rel(extraction_queue_cluster, worker_a, "Команда job_id; ACK после исхода", "AMQPS :5671")
+Rel(worker_a, database_primary, "Lease, план, checkpoints и черновик", "SQL / TLS :5432")
+Rel(worker_a, files_cluster, "Оригинал и фрагменты", "S3 HTTPS :443")
+Rel(worker_a, llm, "ModelPort.extract", "HTTPS :443")
+Deployment_Node(app_b, "APP-B", "Linux VM / Docker") {
+ Container(worker_b, "worker #2", "Celery / Docling / HTTPX", "Семь компонентов; ExtractionContext, порции и checkpoints")
+}
+Rel(extraction_queue_cluster, worker_b, "Команда job_id; ACK после исхода", "AMQPS :5671")
+Rel(worker_b, database_primary, "Lease, план, checkpoints и черновик", "SQL / TLS :5432")
+Rel(worker_b, files_cluster, "Оригинал и фрагменты", "S3 HTTPS :443")
+Rel(worker_b, llm, "ModelPort.extract", "HTTPS :443")
+footer
+Сегмент общей топологии, без новых VM или контейнеров. Показаны стыки выбранной ответственности.
+Полная репликация и остальные соединения приведены на общих листах развертывания.
+endfooter
+@enduml

@@ -1,0 +1,31 @@
+ContainerQueue(extraction_queue, "Очередь извлечения", "RabbitMQ / Celery", "Сообщение содержит job_id")
+ContainerDb(database, "Общая база данных", "PostgreSQL / JSONB", "Схемы, задания, черновики, источники")
+ContainerDb(files, "Хранилище файлов", "Garage / S3 API", "Оригиналы, текст и структура")
+System_Ext(llm, "Сервис языковых моделей", "OpenRouter; извлечение по схеме")
+
+Container_Boundary(worker, "worker — один рабочий процесс Celery") {
+    Boundary(worker_entry_layer, "Входной слой") {
+        Component(task_comp, "Вход задачи Celery", "Python / Celery", "Доставка, результат, поздний ACK")
+    }
+    Boundary(worker_application_layer, "Прикладной слой") {
+        Component(pipeline_comp, "Конвейер обработки", "Python", "Попытка, этапы, фиксация результата")
+        Component(parser_comp, "Разбор документа", "Python / Docling", "Текст, таблицы, ID фрагментов")
+        Component(extractor_comp, "Извлечение значений", "Python / HTTPX", "Схема, фрагменты, ответ модели")
+        Component(worker_validation_comp, "Проверка черновика", "Python / jsonschema", "Типы полей и достоверность ссылок")
+    }
+    Boundary(worker_adapter_layer, "Слой доступа к инфраструктуре") {
+        Component(worker_repository_comp, "Репозиторий обработчика", "SQLAlchemy", "Попытки, черновики и источники")
+        Component(worker_file_store_comp, "Адаптер файлов обработчика", "Python / S3 SDK", "Оригинал и результаты разбора")
+    }
+}
+
+Rel(extraction_queue, task_comp, "Доставить сообщение с job_id", "AMQP 0-9-1 / TLS")
+Rel(task_comp, pipeline_comp, "Запустить обработку задания", "Python Call")
+Rel(pipeline_comp, worker_repository_comp, "Захватить попытку, прочитать схему, сохранить итог", "Python Call")
+Rel(pipeline_comp, worker_file_store_comp, "Получить оригинал, сохранить разбор", "Python Call")
+Rel(pipeline_comp, parser_comp, "Разобрать DOCX или PDF с текстом", "Python Call")
+Rel(pipeline_comp, extractor_comp, "Извлечь значения и ссылки на фрагменты", "Python Call")
+Rel(pipeline_comp, worker_validation_comp, "Проверить значения, цитаты и ссылки", "Python Call")
+Rel(worker_repository_comp, database, "Транзакции задания и результата", "PostgreSQL / TLS")
+Rel(worker_file_store_comp, files, "Прочитать оригинал, записать структуру", "S3 API / HTTPS")
+Rel(extractor_comp, llm, "Передать схему и фрагменты; получить JSON", "HTTPS / JSON")

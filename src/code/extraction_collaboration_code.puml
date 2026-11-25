@@ -1,0 +1,124 @@
+@startuml extraction_collaboration_code
+!include ../style.puml
+title Диаграмма классов UML (Level 4) - extractor_comp
+' Исполнение и порты
+together {
+class ExtractionContext {
+  -_strategy: ExtractionStrategy
+  -_model: ModelPort
+  -_checkpoints: CheckpointPort
+  -_counter: TokenCounter
+  -_limits: ModelLimits
+  -_prompt_version: str
+  -_running: bool
+  --
+  +__init__(strategy: ExtractionStrategy, \n      model: ModelPort, checkpoints: CheckpointPort, \n      counter: TokenCounter, limits: ModelLimits, \n      prompt_version: str = 'v1'): None
+  +set_strategy(strategy: ExtractionStrategy): None
+  -_validate_plan(plan: ExtractionPlan, \n      document: ParsedDocument, schema: SchemaDefinition\n    ): None
+  +run(job_id: str, document: ParsedDocument, \n      schema: SchemaDefinition): ExtractionResult
+}
+interface ModelPort <<interface>> {
+  +model_id: str {readOnly}
+  --
+  +extract(unit: ExtractionUnit): tuple[Candidate, ...]
+}
+interface CheckpointPort <<interface>> {
+  --
+  +bind(job_id: str, fingerprint: str): None
+  +load(job_id: str, unit_id: str\n    ): tuple[Candidate, ...] | None
+  +save(job_id: str, unit_id: str, \n      candidates: tuple[Candidate, ...]): None
+}
+}
+' Порция, источник и результат
+together {
+class ExtractionUnit <<frozen>> {
+  +unit_id: str
+  +fragment_id: str
+  +start: int
+  +end: int
+  +text: str
+  +fields: tuple[str, ...]
+  +request_schema: str
+  +input_cost: int
+  --
+}
+class Candidate <<frozen>> {
+  +field: str
+  +value_json: str
+  +fragment_id: str
+  +start: int
+  +end: int
+  +quote: str
+  --
+}
+class ExtractionResult <<frozen>> {
+  +document_version: str
+  +schema_version: str
+  +values_json: str
+  +candidates: tuple[Candidate, ...]
+  +issues: tuple[str, ...]
+  +confirmed: bool = False
+  --
+}
+class ParsedDocument <<frozen>> {
+  +version_id: str
+  +fragments: tuple[SourceFragment, ...]
+  --
+}
+class SourceFragment <<frozen>> {
+  +fragment_id: str
+  +text: str
+  --
+}
+}
+' Демонстрационные адаптеры
+together {
+class ScriptedModel {
+  -_candidates: tuple[Candidate, ...]
+  -_fail_on_call: int | None
+  +calls: int
+  +model_id: str {readOnly}
+  --
+  +__init__(candidates: tuple[Candidate, ...], \n      fail_on_call: int | None = None): None
+  +extract(unit: ExtractionUnit): tuple[Candidate, ...]
+}
+class MemoryCheckpoints {
+  -_plans: dict[str, str]
+  -_units: dict[tuple[str, str], tuple[Candidate,\n    ...]]
+  --
+  +__init__(): None
+  +bind(job_id: str, fingerprint: str): None
+  +load(job_id: str, unit_id: str\n    ): tuple[Candidate, ...] | None
+  +save(job_id: str, unit_id: str, \n      candidates: tuple[Candidate, ...]): None
+}
+}
+CheckpointPort ..> Candidate : load: результат / save: вход
+ExtractionContext "0..*" --> "1" ModelPort : _model
+ExtractionContext "0..*" --> "1" CheckpointPort : _checkpoints
+ExtractionContext ..> ExtractionResult : run: результат
+ExtractionContext ..> ParsedDocument : _validate_plan: вход / run: вход
+ExtractionResult "0..*" --> "0..*" Candidate : candidates
+MemoryCheckpoints "0..*" --> "0..*" Candidate : _units
+ModelPort ..> Candidate : extract: результат
+ModelPort ..> ExtractionUnit : extract: вход
+ParsedDocument "0..*" --> "0..*" SourceFragment : fragments
+ScriptedModel "0..*" --> "0..*" Candidate : _candidates
+ModelPort <|.. ScriptedModel
+CheckpointPort <|.. MemoryCheckpoints
+ExtractionContext ..> Candidate : run: проверяет источник и объединяет\n    кандидатов
+' Условия приведены текстом в индивидуальном отчёте.
+' Candidate:
+' field относится к полям порции; fragment_id совпадает.
+' start/end находятся внутри порции.
+' quote буквально совпадает с исходным текстом.
+' Проверка цитаты не доказывает правильность значения.
+' MemoryCheckpoints:
+' bind закрепляет fingerprint за job_id.
+' load отличает пустой результат от отсутствующего.
+' Сохранённая порция неизменяема.
+' Это память процесса, а не устойчивый репозиторий.
+' ExtractionResult:
+' Дубликаты кандидатов удаляются.
+' Пропуск или конфликт дают null и issue.
+' Все источники сохраняются; confirmed=false.
+@enduml

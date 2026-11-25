@@ -1,0 +1,27 @@
+{
+  "owner": "backend",
+  "checks": [
+    {
+      "source": "src/components/extraction_components.puml",
+      "required_ids": [
+        "task_comp",
+        "pipeline_comp",
+        "parser_comp",
+        "extractor_comp",
+        "worker_validation_comp",
+        "worker_repository_comp",
+        "worker_file_store_comp"
+      ],
+      "required_edges": [
+        [
+          "extractor_comp",
+          "llm"
+        ],
+        [
+          "worker_repository_comp",
+          "database"
+        ]
+      ]
+    }
+  ]
+}
