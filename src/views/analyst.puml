@@ -1,0 +1,15 @@
+!ifdef ISIT_CONTAINER_NODES
+!include ../shared/container_nodes/web_app.puml
+!include ../shared/container_nodes/api.puml
+!include ../shared/container_nodes/database.puml
+!include ../shared/container_nodes/extraction_queue.puml
+!include ../shared/container_nodes/worker.puml
+!else
+!include ../shared/container_relations/analyst__web_app.puml
+!include ../shared/container_relations/web_app__api.puml
+!include ../shared/container_relations/api__database.puml
+!include ../shared/container_relations/api__extraction_queue.puml
+!include ../shared/container_relations/extraction_queue__worker.puml
+!include ../shared/container_relations/worker__database.puml
+!include ../shared/container_relations/worker__llm.puml
+!endif

@@ -1,0 +1,33 @@
+@startuml deployment_analyst
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Локальное развертывание: Analyst / api
+Deployment_Node(client, "Клиент", "Браузер") {
+ Container(web_app_1, "web_app", "React / TypeScript", "Пользовательская команда")
+}
+Deployment_Node(edge, "EDGE", "Входная VM") {
+ Container(edge_proxy, "Reverse Proxy", "Nginx", "TLS и балансировка")
+}
+Deployment_Node(app_a, "APP-A", "Linux VM / Docker") {
+ Container(api_a, "api #1", "FastAPI / Python", "SchemaValidator и публикация схем; общий контейнер")
+}
+Deployment_Node(app_b, "APP-B", "Linux VM / Docker") {
+ Container(api_b, "api #2", "FastAPI / Python", "SchemaValidator и публикация схем; общий контейнер")
+}
+Deployment_Node(data_a, "DATA-A", "VM / persistent volume") {
+ ContainerDb(database_primary, "database / primary", "PostgreSQL", "Транзакционная работа")
+}
+Deployment_Node(data_b, "DATA-B", "Отдельная VM / volume") {
+ ContainerDb(database_standby, "database / standby", "PostgreSQL", "Асинхронно; ручное продвижение")
+}
+Rel(web_app_1, edge_proxy, "Команда", "HTTPS :443")
+Rel(edge_proxy, api_a, "Готовый экземпляр", "HTTPS :8000")
+Rel(edge_proxy, api_b, "Готовый экземпляр", "HTTPS :8000")
+Rel(database_primary, database_standby, "Асинхронный WAL", "TLS :5432")
+Rel(api_a, database_primary, "Проверяет ревизию и сохраняет версию схемы", "SQL / TLS :5432")
+Rel(api_b, database_primary, "Проверяет ревизию и сохраняет версию схемы", "SQL / TLS :5432")
+footer
+Сегмент общей топологии, без новых VM или контейнеров. Показаны стыки выбранной ответственности.
+Полная репликация и остальные соединения приведены на общих листах развертывания.
+endfooter
+@enduml

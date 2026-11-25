@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "role": "analyst",
+  "lab": 5,
+  "required_files": [
+    "ci/contracts/analyst.json",
+    "docs/review/analyst.md",
+    "prototype/src/report_components/schema_rules.py",
+    "prototype/src/report_components/schema_validation.py",
+    "prototype/tests/test_schema_validation.py",
+    "src/code/schema_validation_code.puml",
+    "src/components/schema_management_components.puml",
+    "src/containers/analyst.puml",
+    "src/context/analyst.puml",
+    "src/deployment/analyst.puml",
+    "src/dynamic/analyst.puml",
+    "src/landscape/analyst.puml",
+    "src/shared/components/schema_comp.puml",
+    "src/shared/components/schema_validation_comp.puml",
+    "src/views/analyst.puml"
+  ]
+}
