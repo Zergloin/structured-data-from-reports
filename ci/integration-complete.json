@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "required_roles": [
+    "teamlead",
+    "backend",
+    "analyst",
+    "techdoc",
+    "devops"
+  ],
+  "expected_sources": 47,
+  "expected_views": 48
+}

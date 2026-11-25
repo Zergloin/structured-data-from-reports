@@ -1,0 +1,1 @@
+Component(export_comp, "Подготовка экспорта\nexport_comp", "Python", "Снимок экспорта; задание и outbox", $tags="Прикладная логика")

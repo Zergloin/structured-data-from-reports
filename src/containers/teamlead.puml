@@ -1,0 +1,17 @@
+@startuml local_containers_teamlead
+!include ../style.puml
+!define RELATIVE_INCLUDE
+!define ISIT_CONTAINER_VIEW
+title Реестр, сравнение и внешние интеграции (C4, уровень 2)
+!include ../shared/person_consumer.puml
+!include ../shared/person_analyst.puml
+!include ../shared/external_archive.puml
+!include ../shared/external_bi.puml
+System_Boundary(report_system, "ИС структурированных данных - выбранные контейнеры") {
+!define ISIT_CONTAINER_NODES
+!include_many ../views/teamlead.puml
+!undef ISIT_CONTAINER_NODES
+}
+!include_many ../views/teamlead.puml
+footer HTTP/SQL/S3: инициатор запроса → сервис. AMQP: отправитель → получатель сообщения.\nОтветы, подписка и ACK опущены. Показана только выбранная часть общей архитектуры.
+@enduml

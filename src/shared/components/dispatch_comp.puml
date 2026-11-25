@@ -1,0 +1,1 @@
+Component(dispatch_comp, "Публикация outbox\ndispatch_comp", "Python / Celery client", "Публикация команд обеих очередей", $tags="Инфраструктура")

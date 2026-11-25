@@ -1,0 +1,62 @@
+{
+  "owner": "teamlead",
+  "checks": [
+    {
+      "source": "src/main.puml",
+      "required_ids": [
+        "api",
+        "database",
+        "extraction_queue",
+        "files",
+        "integration",
+        "integration_queue",
+        "web_app",
+        "worker"
+      ],
+      "required_edges": [
+        [
+          "web_app",
+          "api"
+        ],
+        [
+          "api",
+          "database"
+        ],
+        [
+          "api",
+          "files"
+        ],
+        [
+          "api",
+          "extraction_queue"
+        ],
+        [
+          "api",
+          "integration_queue"
+        ],
+        [
+          "extraction_queue",
+          "worker"
+        ],
+        [
+          "integration_queue",
+          "integration"
+        ]
+      ],
+      "forbidden_edges": [
+        [
+          "integration",
+          "database"
+        ],
+        [
+          "worker",
+          "extraction_queue"
+        ],
+        [
+          "worker",
+          "integration_queue"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+!ifdef ISIT_CONTAINER_NODES
+!include ../shared/container_nodes/web_app.puml
+!include ../shared/container_nodes/api.puml
+!include ../shared/container_nodes/database.puml
+!include ../shared/container_nodes/files.puml
+!include ../shared/container_nodes/integration_queue.puml
+!include ../shared/container_nodes/integration.puml
+!else
+!include ../shared/container_relations/consumer__web_app.puml
+!include ../shared/container_relations/analyst__web_app.puml
+!include ../shared/container_relations/web_app__api.puml
+!include ../shared/container_relations/api__database.puml
+!include ../shared/container_relations/api__files.puml
+!include ../shared/container_relations/api__integration_queue.puml
+!include ../shared/container_relations/integration_queue__integration.puml
+!include ../shared/container_relations/integration__api.puml
+!include ../shared/container_relations/integration__archive.puml
+!include ../shared/container_relations/integration__bi.puml
+!endif
