@@ -1,0 +1,53 @@
+{
+  "containers": [
+    "api",
+    "database",
+    "extraction_queue",
+    "files",
+    "integration",
+    "integration_queue",
+    "web_app",
+    "worker"
+  ],
+  "components": [
+    "api_controller",
+    "auth_comp",
+    "comparison_comp",
+    "dispatch_comp",
+    "document_comp",
+    "export_comp",
+    "extractor_comp",
+    "file_store_comp",
+    "int_analytics",
+    "int_api",
+    "int_archive",
+    "int_consumer",
+    "int_flow",
+    "job_comp",
+    "parser_comp",
+    "pipeline_comp",
+    "registry_comp",
+    "repository_comp",
+    "review_comp",
+    "schema_comp",
+    "schema_validation_comp",
+    "task_comp",
+    "validation_comp",
+    "web_api",
+    "web_evidence",
+    "web_review",
+    "web_rules",
+    "web_session",
+    "web_viewer",
+    "worker_file_store_comp",
+    "worker_repository_comp",
+    "worker_validation_comp"
+  ],
+  "roles": [
+    "operator",
+    "reviewer",
+    "analyst",
+    "consumer",
+    "admin"
+  ]
+}

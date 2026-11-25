@@ -1,0 +1,11 @@
+@startuml context_analyst
+!include ../style.puml
+title Контекст: Аналитик
+!include ../shared/context_base.puml
+!include ../shared/person_analyst.puml
+!include ../shared/relations/schema.puml
+!include ../shared/relations/llm.puml
+!include ../shared/relations/archive.puml
+!include ../shared/relations/bi.puml
+footer Фокус участника; идентификаторы взяты из общего контекста.
+@enduml

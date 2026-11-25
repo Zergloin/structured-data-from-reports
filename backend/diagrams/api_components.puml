@@ -1,0 +1,39 @@
+Container(web_app, "Веб-приложение", "React / TypeScript", "Загрузка, задания, проверка")
+ContainerDb(database, "Общая база данных", "PostgreSQL / JSONB", "Версии, задания, черновики, история")
+ContainerDb(files, "Хранилище файлов", "Garage / S3 API", "Неизменяемые оригиналы")
+ContainerQueue(extraction_queue, "Очередь извлечения", "RabbitMQ / Celery", "Сообщение содержит job_id")
+
+Container_Boundary(api, "api — один процесс FastAPI") {
+    Boundary(api_entry_layer, "Входной слой") {
+        Component(api_controller, "HTTP-контроллеры", "FastAPI / Pydantic", "Проверка запросов и ответы API")
+        Component(auth_comp, "Доступ и роли", "Python", "Личность и разрешения")
+    }
+    Boundary(api_application_layer, "Прикладной слой") {
+        Component(document_comp, "Приём документов", "Python", "Формат, checksum, версия файла")
+        Component(job_comp, "Задания обработки", "Python", "Версии, статусы, повторы")
+        Component(review_comp, "Работа с черновиком", "Python", "Правки и подтверждение версии")
+        Component(validation_comp, "Проверка значений", "Python / jsonschema", "Ошибки полей и обязательность")
+    }
+    Boundary(api_adapter_layer, "Слой доступа к инфраструктуре") {
+        Component(repository_comp, "Репозиторий и транзакции", "SQLAlchemy", "Метаданные, outbox, история")
+        Component(file_store_comp, "Адаптер файлов", "Python / S3 SDK", "Запись оригинала по новому ключу")
+        Component(dispatch_comp, "Публикация outbox", "Python / Celery client", "Фоновая корутина процесса API")
+    }
+}
+
+Rel(web_app, api_controller, "Файлы и операции", "HTTPS / REST / JSON, multipart")
+Rel(api_controller, auth_comp, "Проверить доступ", "Python Call")
+Rel(api_controller, document_comp, "Принять оригинал", "Python Call")
+Rel(api_controller, job_comp, "Статус и повтор", "Python Call")
+Rel(api_controller, review_comp, "Правки и решение", "Python Call")
+Rel(auth_comp, repository_comp, "Учётная запись и роли", "Python Call")
+Rel(document_comp, file_store_comp, "Записать оригинал", "Python Call")
+Rel(document_comp, repository_comp, "Версия документа", "Python Call")
+Rel(document_comp, job_comp, "Создать задание", "Python Call")
+Rel(job_comp, repository_comp, "Задание и outbox", "Python Call")
+Rel(review_comp, validation_comp, "Проверить значения", "Python Call")
+Rel(review_comp, repository_comp, "Сохранить с revision", "Python Call")
+Rel(dispatch_comp, repository_comp, "События outbox", "Python Call")
+Rel(dispatch_comp, extraction_queue, "Публикация job_id", "AMQP 0-9-1 / TLS")
+Rel(repository_comp, database, "Чтение и запись", "PostgreSQL / TLS")
+Rel(file_store_comp, files, "Объекты файлов", "S3 API / HTTPS")

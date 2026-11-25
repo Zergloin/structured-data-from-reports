@@ -1,0 +1,19 @@
+@startuml api_components
+!define RELATIVE_INCLUDE
+!include ../diagrams/vendor/C4_Component.puml
+!pragma layout smetana
+HIDE_STEREOTYPE()
+LAYOUT_TOP_DOWN()
+title Прикладной сервер api — компоненты C4 L3
+!include diagrams/api_components.puml
+@enduml
+
+@startuml worker_components
+!define RELATIVE_INCLUDE
+!include ../diagrams/vendor/C4_Component.puml
+!pragma layout smetana
+HIDE_STEREOTYPE()
+LAYOUT_TOP_DOWN()
+title Обработчик документов worker — компоненты C4 L3
+!include diagrams/worker_components.puml
+@enduml

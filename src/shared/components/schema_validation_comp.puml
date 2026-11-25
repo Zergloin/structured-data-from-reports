@@ -1,0 +1,1 @@
+Component(schema_validation_comp, "Проверка схемы\nschema_validation_comp", "jsonschema / Python", "Типы, единицы и ограничения", $tags="Предметная логика")

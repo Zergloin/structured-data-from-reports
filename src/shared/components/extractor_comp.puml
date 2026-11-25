@@ -1,0 +1,1 @@
+Component(extractor_comp, "Извлечение значений\nextractor_comp", "Python / HTTPX", "Порции, лимиты, кандидаты и покрытие", $tags="Прикладная логика")

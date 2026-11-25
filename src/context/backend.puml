@@ -1,0 +1,11 @@
+@startuml context_backend
+!include ../style.puml
+title Контекст: Бэкенд-разработчик
+!include ../shared/context_base.puml
+!include ../shared/person_operator.puml
+!include ../shared/relations/op.puml
+!include ../shared/relations/llm.puml
+!include ../shared/relations/archive.puml
+!include ../shared/relations/bi.puml
+footer Фокус участника; идентификаторы взяты из общего контекста.
+@enduml

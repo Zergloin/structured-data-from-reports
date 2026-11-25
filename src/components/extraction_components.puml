@@ -1,0 +1,38 @@
+@startuml extraction_components
+!include ../style.puml
+!define RELATIVE_INCLUDE
+!define ISIT_CONTAINER_VIEW
+title Извлечение и сборка черновика\nC4: компоненты контейнера worker
+!include ../shared/container_nodes/database.puml
+!include ../shared/container_nodes/extraction_queue.puml
+!include ../shared/container_nodes/files.puml
+!include ../shared/external_llm.puml
+Container_Boundary(worker, "worker: компоненты одного процесса") {
+Boundary(worker_layer_0, "Вход") {
+!include ../shared/components/task_comp.puml
+}
+Boundary(worker_layer_1, "Прикладная логика") {
+!include ../shared/components/pipeline_comp.puml
+!include ../shared/components/parser_comp.puml
+!include ../shared/components/extractor_comp.puml
+}
+Boundary(worker_layer_2, "Предметная логика") {
+!include ../shared/components/worker_validation_comp.puml
+}
+Boundary(worker_layer_3, "Инфраструктура") {
+!include ../shared/components/worker_repository_comp.puml
+!include ../shared/components/worker_file_store_comp.puml
+}
+}
+Rel(task_comp, pipeline_comp, "W01: Запускает обработку задания", "Python Call")
+Rel(pipeline_comp, worker_repository_comp, "W02: Читает входы, сохраняет прогресс и исход", "Python Call")
+Rel(pipeline_comp, worker_file_store_comp, "W03: Читает оригинал и сохраняет разбор", "Python Call")
+Rel(pipeline_comp, parser_comp, "W04: Передаёт содержимое для разбора", "Python Call")
+Rel(pipeline_comp, extractor_comp, "W05: Передаёт фрагменты, схему и сохранённый план", "Python Call")
+Rel(pipeline_comp, worker_validation_comp, "W06: Проверяет кандидатов и источники", "Python Call")
+Rel(extraction_queue, task_comp, "N05: Доставляет команду извлечения с job_id", "AMQP / Celery JSON")
+Rel(worker_file_store_comp, files, "N07: Читает оригинал и сохраняет артефакты", "S3 API / HTTPS")
+Rel(extractor_comp, llm, "N08: Запрашивает кандидатов для порции текста", "HTTPS / JSON")
+Rel(worker_repository_comp, database, "N09: Читает входы; сохраняет план, итог и outbox", "SQL / PostgreSQL")
+footer Стрелка: инициатор → получатель; ответы опущены. AMQP обозначает доставку команды.\nПовторы обоих обработчиков публикует dispatch_comp API через outbox.
+@enduml
