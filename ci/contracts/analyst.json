@@ -1,0 +1,18 @@
+{
+  "owner": "analyst",
+  "checks": [
+    {
+      "source": "src/components/schema_management_components.puml",
+      "required_ids": [
+        "schema_comp",
+        "schema_validation_comp"
+      ],
+      "required_edges": [
+        [
+          "schema_comp",
+          "schema_validation_comp"
+        ]
+      ]
+    }
+  ]
+}

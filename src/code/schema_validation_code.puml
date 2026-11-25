@@ -1,0 +1,99 @@
+@startuml schema_validation_code
+!include ../style.puml
+title Диаграмма классов UML (Level 4) - schema_validation_comp
+' Проверяющий компонент
+together {
+class SchemaValidator {
+  -_policy: SchemaPolicy
+  --
+  +__init__(policy: SchemaPolicy): None
+  +set_strategy(policy: SchemaPolicy): None
+  +validate(schema: SchemaDefinition\n    ): SchemaValidationResult
+}
+interface SchemaPolicy <<interface>> {
+  +mode: str {readOnly}
+  --
+  +check(schema: SchemaDefinition\n    ): tuple[ValidationIssue, ...]
+}
+class DraftSchemaStrategy {
+  +mode: str {readOnly}
+  --
+  +check(schema: SchemaDefinition\n    ): tuple[ValidationIssue, ...]
+}
+class PublishSchemaStrategy {
+  +mode: str {readOnly}
+  --
+  +check(schema: SchemaDefinition\n    ): tuple[ValidationIssue, ...]
+}
+}
+' Описание извлекаемых полей
+together {
+class SchemaDefinition <<frozen>> {
+  +schema_id: str
+  +revision: int
+  +schema_json: str
+  +fields: tuple[FieldDefinition, ...]
+  +version_id: str | None = None
+  +schema: dict[str, JsonValue] {readOnly}
+  --
+}
+class FieldDefinition <<frozen>> {
+  +key: str
+  +semantic_id: str
+  +kind: FieldKind
+  +description: str = ''
+  +unit: str | None = None
+  --
+}
+enum FieldKind {
+  STRING = 'string'
+  INTEGER = 'integer'
+  NUMBER = 'number'
+  BOOLEAN = 'boolean'
+}
+}
+' Результат и замечания
+together {
+class SchemaValidationResult <<frozen>> {
+  +mode: str
+  +accepted: bool
+  +issues: tuple[ValidationIssue, ...]
+  --
+}
+class ValidationIssue <<frozen>> {
+  +code: str
+  +path: str
+  +message: str
+  +error: bool = True
+  +blocks_draft: bool = False
+  --
+}
+}
+FieldDefinition "0..*" --> "1" FieldKind : kind
+SchemaDefinition "0..*" --> "0..*" FieldDefinition : fields
+SchemaPolicy ..> SchemaDefinition : check: вход
+SchemaPolicy ..> ValidationIssue : check: результат
+SchemaValidationResult "0..*" --> "0..*" ValidationIssue : issues
+SchemaValidator "0..*" --> "1" SchemaPolicy : _policy
+SchemaValidator ..> SchemaDefinition : validate: вход
+SchemaValidator ..> SchemaValidationResult : validate: результат
+SchemaPolicy <|.. DraftSchemaStrategy
+SchemaPolicy <|.. PublishSchemaStrategy
+DraftSchemaStrategy -[hidden]right-> PublishSchemaStrategy
+' Условия приведены текстом в индивидуальном отчёте.
+' SchemaValidator:
+' common_checks выполняется перед политикой:
+' JSON Schema, состав и типы полей, required,
+' уникальность key и semantic_id, запрет внешних $ref.
+' DraftSchemaStrategy:
+' mode = draft.
+' Пустое описание поля даёт предупреждение.
+' PublishSchemaStrategy:
+' mode = publish.
+' Нужны описания, ревизия и непустые поля.
+' additionalProperties = false.
+' Единицы разрешены для числовых полей.
+' SchemaValidationResult:
+' accepted = нет замечаний с error=true.
+' Проверка не публикует и не сохраняет схему.
+@enduml

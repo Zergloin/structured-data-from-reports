@@ -1,0 +1,26 @@
+@startuml dynamic_backend
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Backend: Извлечение с покрытием, контрольными точками и возобновлением
+Container_Boundary(worker_boundary, "worker: существующий контейнер") {
+Component(task_comp, "Вход задачи Celery\ntask_comp", "Python / Celery", "Принимает идентификатор задания, вызывает конвейер и подтверждает доставку после устойчивого результата.")
+Component(pipeline_comp, "Конвейер обработки\npipeline_comp", "Python", "Получает право исполнения, координирует разбор, извлечение и проверку, продлевает право и фиксирует исход")
+Component(parser_comp, "Разбор документа\nparser_comp", "Python / Docling", "Преобразует переданное содержимое DOCX или PDF с текстовым слоем в текст, таблицы и фрагменты источника.")
+Component(extractor_comp, "Извлечение значений\nextractor_comp", "Python / HTTPX", "Планирует порции текста и группы полей по контекстному бюджету, вызывает модель, объединяет кандидатов и ")
+Component(worker_repository_comp, "Репозиторий обработчика\nworker_repository_comp", "SQLAlchemy", "Хранит попытки, закреплённые входы, план, кандидатов и черновик; при временной ошибке атомарно регистриру")
+Component(worker_validation_comp, "Проверка черновика\nworker_validation_comp", "Python / jsonschema", "Проверяет типы, ограничения, существование фрагментов и совпадение цитат; сохраняет ошибки и не подтвержд")
+}
+System_Ext(llm, "Внешний сервис LLM", "Внешняя система")
+Rel(task_comp, pipeline_comp, "1. Передает job_id и начинает обработку попытки", "Python call")
+Rel(pipeline_comp, worker_repository_comp, "2. Проверяет lease и читает закрепленные версии", "Python call")
+Rel(pipeline_comp, parser_comp, "3. Получает ParsedDocument после разбора", "Python call")
+Rel(pipeline_comp, extractor_comp, "4. ExtractionContext.run(job_id, document, schema)", "Python call")
+Rel(extractor_comp, llm, "5. ModelPort.extract(unit) для незавершенных порций", "HTTPS / JSON")
+Rel(extractor_comp, worker_repository_comp, "6. CheckpointPort.save: сохраняет проверенные кандидаты", "Python call / SQL в адаптере")
+Rel(pipeline_comp, worker_validation_comp, "7. Проверяет собранный черновик и покрытие", "Python call")
+Rel(pipeline_comp, worker_repository_comp, "8. Фиксирует итог до разрешения ACK", "Python call")
+footer
+worker - граница развертывания. Классы Strategy не являются отдельными сервисами.
+Номера - хронология данного локального сценария; ответы без изменения состояния сокращены.
+endfooter
+@enduml

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "role": "backend",
+  "lab": 5,
+  "required_files": [
+    "ci/contracts/backend.json",
+    "docs/review/backend.md",
+    "prototype/src/report_components/extraction.py",
+    "prototype/tests/test_extraction.py",
+    "src/code/extraction_code.puml",
+    "src/code/extraction_collaboration_code.puml",
+    "src/components/extraction_components.puml",
+    "src/containers/backend.puml",
+    "src/context/backend.puml",
+    "src/deployment/backend.puml",
+    "src/dynamic/backend.puml",
+    "src/dynamic/extraction_dynamic.puml",
+    "src/landscape/backend.puml",
+    "src/shared/components/extractor_comp.puml",
+    "src/shared/components/parser_comp.puml",
+    "src/shared/components/pipeline_comp.puml",
+    "src/shared/components/task_comp.puml",
+    "src/shared/components/worker_file_store_comp.puml",
+    "src/shared/components/worker_repository_comp.puml",
+    "src/shared/components/worker_validation_comp.puml",
+    "src/views/backend.puml"
+  ]
+}

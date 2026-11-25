@@ -1,0 +1,142 @@
+@startuml extraction_code
+!include ../style.puml
+title Диаграмма классов UML (Level 4) - extractor_comp
+' Управление и Strategy
+together {
+class ExtractionContext {
+  -_strategy: ExtractionStrategy
+  -_model: ModelPort
+  -_checkpoints: CheckpointPort
+  -_counter: TokenCounter
+  -_limits: ModelLimits
+  -_prompt_version: str
+  -_running: bool
+  --
+  +__init__(strategy: ExtractionStrategy, \n      model: ModelPort, checkpoints: CheckpointPort, \n      counter: TokenCounter, limits: ModelLimits, \n      prompt_version: str = 'v1'): None
+  +set_strategy(strategy: ExtractionStrategy): None
+  -_validate_plan(plan: ExtractionPlan, \n      document: ParsedDocument, schema: SchemaDefinition\n    ): None
+  +run(job_id: str, document: ParsedDocument, \n      schema: SchemaDefinition): ExtractionResult
+}
+interface ExtractionStrategy <<interface>> {
+  --
+  +build_plan(document: ParsedDocument, \n      schema: SchemaDefinition, limits: ModelLimits, \n      counter: TokenCounter): ExtractionPlan
+}
+class WholeSchemaChunkStrategy {
+  --
+  +build_plan(document: ParsedDocument, \n      schema: SchemaDefinition, limits: ModelLimits, \n      counter: TokenCounter): ExtractionPlan
+}
+class GroupedFieldChunkStrategy {
+  -_group_size: int
+  --
+  +__init__(group_size: int = 1): None
+  +build_plan(document: ParsedDocument, \n      schema: SchemaDefinition, limits: ModelLimits, \n      counter: TokenCounter): ExtractionPlan
+}
+}
+' Входные версии
+together {
+class ParsedDocument <<frozen>> {
+  +version_id: str
+  +fragments: tuple[SourceFragment, ...]
+  --
+}
+class SourceFragment <<frozen>> {
+  +fragment_id: str
+  +text: str
+  --
+}
+class SchemaDefinition <<frozen>> {
+  +schema_id: str
+  +revision: int
+  +schema_json: str
+  +fields: tuple[FieldDefinition, ...]
+  +version_id: str | None = None
+  +schema: dict[str, JsonValue] {readOnly}
+  --
+}
+class FieldDefinition <<frozen>> {
+  +key: str
+  +semantic_id: str
+  +kind: FieldKind
+  +description: str = ''
+  +unit: str | None = None
+  --
+}
+enum FieldKind {
+  STRING = 'string'
+  INTEGER = 'integer'
+  NUMBER = 'number'
+  BOOLEAN = 'boolean'
+}
+}
+' Ограничения и план
+together {
+class ModelLimits <<frozen>> {
+  +context: int
+  +output: int
+  +reserve: int
+  --
+  -__post_init__(): None
+}
+interface TokenCounter <<interface>> {
+  --
+  +count(text: str): int
+}
+class ByteTokenCounter {
+  --
+  +count(text: str): int
+}
+class ExtractionPlan <<frozen>> {
+  +document_version: str
+  +schema_version: str
+  +units: tuple[ExtractionUnit, ...]
+  +fingerprint: str
+  --
+}
+class ExtractionUnit <<frozen>> {
+  +unit_id: str
+  +fragment_id: str
+  +start: int
+  +end: int
+  +text: str
+  +fields: tuple[str, ...]
+  +request_schema: str
+  +input_cost: int
+  --
+}
+}
+ExtractionContext "0..*" --> "1" ExtractionStrategy : _strategy
+ExtractionContext "0..*" --> "1" TokenCounter : _counter
+ExtractionContext "0..*" --> "1" ModelLimits : _limits
+ExtractionContext ..> ExtractionPlan : _validate_plan: вход
+ExtractionContext ..> ParsedDocument : _validate_plan: вход / run: вход
+ExtractionContext ..> SchemaDefinition : _validate_plan: вход / run: вход
+ExtractionPlan "0..*" --> "0..*" ExtractionUnit : units
+ExtractionStrategy ..> ExtractionPlan : build_plan: результат
+ExtractionStrategy ..> ModelLimits : build_plan: вход
+ExtractionStrategy ..> ParsedDocument : build_plan: вход
+ExtractionStrategy ..> SchemaDefinition : build_plan: вход
+ExtractionStrategy ..> TokenCounter : build_plan: вход
+FieldDefinition "0..*" --> "1" FieldKind : kind
+ParsedDocument "0..*" --> "0..*" SourceFragment : fragments
+SchemaDefinition "0..*" --> "0..*" FieldDefinition : fields
+ExtractionStrategy <|.. WholeSchemaChunkStrategy
+ExtractionStrategy <|.. GroupedFieldChunkStrategy
+TokenCounter <|.. ByteTokenCounter
+WholeSchemaChunkStrategy -[hidden]right-> GroupedFieldChunkStrategy
+' Условия приведены текстом в индивидуальном отчёте.
+' ExtractionContext:
+' _validate_plan проверяет интервалы, поля, бюджет
+' и полное покрытие каждого поля по всему тексту.
+' Смена стратегии во время run запрещена.
+' ExtractionUnit:
+' input_cost + output + reserve <= context.
+' start/end относятся к исходному фрагменту.
+' Порция содержит только выбранные поля схемы.
+' ExtractionPlan:
+' fingerprint закрепляет версии, порции и лимиты.
+' Задание дополнительно связано с моделью
+' и версией инструкции через CheckpointPort.
+' ByteTokenCounter:
+' Демонстрационный счётчик байтов UTF-8.
+' Для реальной модели нужен её токенизатор.
+@enduml

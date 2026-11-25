@@ -1,0 +1,6 @@
+{
+  "plantuml.render": "PlantUMLServer",
+  "plantuml.server": "http://127.0.0.1:18080",
+  "files.eol": "\n",
+  "files.encoding": "utf8"
+}

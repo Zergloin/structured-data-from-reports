@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "role": "techdoc",
+  "lab": 5,
+  "required_files": [
+    ".vscode/extensions.json",
+    ".vscode/settings.json",
+    "ci/contracts/techdoc.json",
+    "docs/review/techdoc.md",
+    "prototype/src/report_components/value_validation.py",
+    "prototype/tests/test_value_validation.py",
+    "src/code/value_validation_code.puml",
+    "src/components/verification_api_components.puml",
+    "src/components/verification_ui_components.puml",
+    "src/containers/techdoc.puml",
+    "src/context/techdoc.puml",
+    "src/deployment/techdoc.puml",
+    "src/dynamic/techdoc.puml",
+    "src/landscape/techdoc.puml",
+    "src/shared/components/review_comp.puml",
+    "src/shared/components/validation_comp.puml",
+    "src/shared/components/web_api.puml",
+    "src/shared/components/web_evidence.puml",
+    "src/shared/components/web_review.puml",
+    "src/shared/components/web_rules.puml",
+    "src/shared/components/web_session.puml",
+    "src/shared/components/web_viewer.puml",
+    "src/views/techdoc.puml"
+  ]
+}

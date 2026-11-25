@@ -1,0 +1,18 @@
+{
+  "owner": "techdoc",
+  "checks": [
+    {
+      "source": "src/components/verification_api_components.puml",
+      "required_ids": [
+        "review_comp",
+        "validation_comp"
+      ],
+      "required_edges": [
+        [
+          "review_comp",
+          "validation_comp"
+        ]
+      ]
+    }
+  ]
+}
