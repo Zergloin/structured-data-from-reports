@@ -1,0 +1,381 @@
+{
+  "entries": [
+    {
+      "source": "src/code/comparison_code.puml",
+      "outputs": [
+        "comparison_code"
+      ],
+      "level": "L4 - Код",
+      "title": "Диаграмма классов UML (Level 4) - comparison_comp"
+    },
+    {
+      "source": "src/code/extraction_code.puml",
+      "outputs": [
+        "extraction_code"
+      ],
+      "level": "L4 - Код",
+      "title": "Диаграмма классов UML (Level 4) - extractor_comp"
+    },
+    {
+      "source": "src/code/extraction_collaboration_code.puml",
+      "outputs": [
+        "extraction_collaboration_code"
+      ],
+      "level": "L4 - Код",
+      "title": "Диаграмма классов UML (Level 4) - extractor_comp"
+    },
+    {
+      "source": "src/code/integration_api_code.puml",
+      "outputs": [
+        "integration_api_code"
+      ],
+      "level": "L4 - Код",
+      "title": "Диаграмма классов UML (Level 4) - int_flow"
+    },
+    {
+      "source": "src/code/integration_code.puml",
+      "outputs": [
+        "integration_code"
+      ],
+      "level": "L4 - Код",
+      "title": "Диаграмма классов UML (Level 4) - int_flow"
+    },
+    {
+      "source": "src/code/schema_validation_code.puml",
+      "outputs": [
+        "schema_validation_code"
+      ],
+      "level": "L4 - Код",
+      "title": "Диаграмма классов UML (Level 4) - schema_validation_comp"
+    },
+    {
+      "source": "src/code/value_validation_code.puml",
+      "outputs": [
+        "value_validation_code"
+      ],
+      "level": "L4 - Код",
+      "title": "Диаграмма классов UML (Level 4) - validation_comp"
+    },
+    {
+      "source": "src/components/api_components.puml",
+      "outputs": [
+        "api_components"
+      ],
+      "level": "L3 - Компоненты",
+      "title": "Прикладной сервер: согласованная компонентная модель C4: компоненты контейнера api"
+    },
+    {
+      "source": "src/components/api_registry_components.puml",
+      "outputs": [
+        "api_registry_components"
+      ],
+      "level": "L3 - Компоненты",
+      "title": "Реестр, сравнение и экспорт C4: компоненты контейнера api"
+    },
+    {
+      "source": "src/components/extraction_components.puml",
+      "outputs": [
+        "extraction_components"
+      ],
+      "level": "L3 - Компоненты",
+      "title": "Извлечение и сборка черновика C4: компоненты контейнера worker"
+    },
+    {
+      "source": "src/components/integrations_components.puml",
+      "outputs": [
+        "integrations_components"
+      ],
+      "level": "L3 - Компоненты",
+      "title": "Приём команд и внешний обмен C4: компоненты контейнера integration"
+    },
+    {
+      "source": "src/components/schema_management_components.puml",
+      "outputs": [
+        "schema_management_components"
+      ],
+      "level": "L3 - Компоненты",
+      "title": "Схемы и правила извлечения C4: компоненты контейнера api"
+    },
+    {
+      "source": "src/components/verification_api_components.puml",
+      "outputs": [
+        "verification_api_components"
+      ],
+      "level": "L3 - Компоненты",
+      "title": "Серверная верификация и проверка значений C4: компоненты контейнера api"
+    },
+    {
+      "source": "src/components/verification_ui_components.puml",
+      "outputs": [
+        "verification_ui_components"
+      ],
+      "level": "L3 - Компоненты",
+      "title": "Прикладной сценарий верификации C4: компоненты контейнера web_app"
+    },
+    {
+      "source": "src/containers/analyst.puml",
+      "outputs": [
+        "local_containers_analyst"
+      ],
+      "level": "L2 - Контейнеры",
+      "title": "Публикация схем и применение ограничений (C4, уровень 2)"
+    },
+    {
+      "source": "src/containers/backend.puml",
+      "outputs": [
+        "local_containers_backend"
+      ],
+      "level": "L2 - Контейнеры",
+      "title": "Загрузка, разбор и извлечение (C4, уровень 2)"
+    },
+    {
+      "source": "src/containers/devops.puml",
+      "outputs": [
+        "local_containers_devops"
+      ],
+      "level": "L2 - Контейнеры",
+      "title": "Маршрутизация заданий и повторные попытки (C4, уровень 2)"
+    },
+    {
+      "source": "src/containers/teamlead.puml",
+      "outputs": [
+        "local_containers_teamlead"
+      ],
+      "level": "L2 - Контейнеры",
+      "title": "Реестр, сравнение и внешние интеграции (C4, уровень 2)"
+    },
+    {
+      "source": "src/containers/techdoc.puml",
+      "outputs": [
+        "local_containers_techdoc"
+      ],
+      "level": "L2 - Контейнеры",
+      "title": "Верификация и происхождение значений (C4, уровень 2)"
+    },
+    {
+      "source": "src/context/analyst.puml",
+      "outputs": [
+        "context_analyst"
+      ],
+      "level": "L1 - Контекст",
+      "title": "Контекст: Аналитик"
+    },
+    {
+      "source": "src/context/backend.puml",
+      "outputs": [
+        "context_backend"
+      ],
+      "level": "L1 - Контекст",
+      "title": "Контекст: Бэкенд-разработчик"
+    },
+    {
+      "source": "src/context/context.puml",
+      "outputs": [
+        "context"
+      ],
+      "level": "L1 - Контекст",
+      "title": "Системный контекст: общее представление (C4, уровень 1)"
+    },
+    {
+      "source": "src/context/devops.puml",
+      "outputs": [
+        "context_devops"
+      ],
+      "level": "L1 - Контекст",
+      "title": "Контекст: DevOps-инженер"
+    },
+    {
+      "source": "src/context/teamlead.puml",
+      "outputs": [
+        "context_teamlead"
+      ],
+      "level": "L1 - Контекст",
+      "title": "Контекст: Тимлид"
+    },
+    {
+      "source": "src/context/techdoc.puml",
+      "outputs": [
+        "context_techdoc"
+      ],
+      "level": "L1 - Контекст",
+      "title": "Контекст: Технический писатель"
+    },
+    {
+      "source": "src/deployment/analyst.puml",
+      "outputs": [
+        "deployment_analyst"
+      ],
+      "level": "Развертывание",
+      "title": "Локальное развертывание: Analyst / api"
+    },
+    {
+      "source": "src/deployment/apps.puml",
+      "outputs": [
+        "deployment_apps"
+      ],
+      "level": "Развертывание",
+      "title": "Развертывание: клиент, вход и два узла приложения"
+    },
+    {
+      "source": "src/deployment/backend.puml",
+      "outputs": [
+        "deployment_backend"
+      ],
+      "level": "Развертывание",
+      "title": "Локальное развертывание: Backend / worker"
+    },
+    {
+      "source": "src/deployment/data.puml",
+      "outputs": [
+        "deployment_data"
+      ],
+      "level": "Развертывание",
+      "title": "Развертывание: данные, очередь и репликация"
+    },
+    {
+      "source": "src/deployment/devops.puml",
+      "outputs": [
+        "deployment_devops"
+      ],
+      "level": "Развертывание",
+      "title": "Локальное развертывание: DevOps / integration"
+    },
+    {
+      "source": "src/deployment/teamlead.puml",
+      "outputs": [
+        "deployment_teamlead"
+      ],
+      "level": "Развертывание",
+      "title": "Локальное развертывание: Тимлид / api"
+    },
+    {
+      "source": "src/deployment/techdoc.puml",
+      "outputs": [
+        "deployment_techdoc"
+      ],
+      "level": "Развертывание",
+      "title": "Локальное развертывание: TechDoc / api"
+    },
+    {
+      "source": "src/dynamic/analyst.puml",
+      "outputs": [
+        "dynamic_analyst"
+      ],
+      "level": "Динамика",
+      "title": "Analyst: Публикация проверенной версии схемы"
+    },
+    {
+      "source": "src/dynamic/backend.puml",
+      "outputs": [
+        "dynamic_backend"
+      ],
+      "level": "Динамика",
+      "title": "Backend: Извлечение с покрытием, контрольными точками и возобновлением"
+    },
+    {
+      "source": "src/dynamic/devops.puml",
+      "outputs": [
+        "dynamic_devops"
+      ],
+      "level": "Динамика",
+      "title": "DevOps: Передача снимка и согласование неизвестного исхода"
+    },
+    {
+      "source": "src/dynamic/extraction_dynamic.puml",
+      "outputs": [
+        "extraction_dynamic"
+      ],
+      "level": "Динамика",
+      "title": "Обработка документа: порции, проверка и сохранение черновика"
+    },
+    {
+      "source": "src/dynamic/process.puml",
+      "outputs": [
+        "dynamic_extraction",
+        "dynamic_confirmation_export"
+      ],
+      "level": "Динамика",
+      "title": "Динамическая диаграмма C4: Прием отчета и извлечение - лист 1 из 2"
+    },
+    {
+      "source": "src/dynamic/teamlead.puml",
+      "outputs": [
+        "dynamic_teamlead"
+      ],
+      "level": "Динамика",
+      "title": "Тимлид: Сопоставление принятых версий и согласование сквозного процесса"
+    },
+    {
+      "source": "src/dynamic/techdoc.puml",
+      "outputs": [
+        "dynamic_techdoc"
+      ],
+      "level": "Динамика",
+      "title": "TechDoc: Серверная проверка правок и подтверждение записи"
+    },
+    {
+      "source": "src/landscape/analyst.puml",
+      "outputs": [
+        "landscape_analyst"
+      ],
+      "level": "Ландшафт",
+      "title": "Ландшафт L0: Analyst / Аналитик"
+    },
+    {
+      "source": "src/landscape/backend.puml",
+      "outputs": [
+        "landscape_backend"
+      ],
+      "level": "Ландшафт",
+      "title": "Ландшафт L0: Backend / Оператор"
+    },
+    {
+      "source": "src/landscape/devops.puml",
+      "outputs": [
+        "landscape_devops"
+      ],
+      "level": "Ландшафт",
+      "title": "Ландшафт L0: DevOps / Администратор интеграций"
+    },
+    {
+      "source": "src/landscape/landscape.puml",
+      "outputs": [
+        "landscape"
+      ],
+      "level": "Ландшафт",
+      "title": "Системный ландшафт подразделения проектной отчетности. C4 L0"
+    },
+    {
+      "source": "src/landscape/teamlead.puml",
+      "outputs": [
+        "landscape_teamlead"
+      ],
+      "level": "Ландшафт",
+      "title": "Ландшафт L0: Тимлид / Потребитель"
+    },
+    {
+      "source": "src/landscape/techdoc.puml",
+      "outputs": [
+        "landscape_techdoc"
+      ],
+      "level": "Ландшафт",
+      "title": "Ландшафт L0: TechDoc / Эксперт"
+    },
+    {
+      "source": "src/main.puml",
+      "outputs": [
+        "main"
+      ],
+      "level": "L2 - Контейнеры",
+      "title": "Общая диаграмма контейнеров (C4, уровень 2)"
+    },
+    {
+      "source": "docs/flows/ci_pipeline.puml",
+      "outputs": [
+        "ci_pipeline"
+      ],
+      "level": "Сборка проекта",
+      "title": "Проверка и сборка архитектурной документации"
+    }
+  ]
+}
