@@ -1,0 +1,1 @@
+Component(pipeline_comp, "Конвейер обработки\npipeline_comp", "Python", "Этапы, прогресс и исход попытки", $tags="Прикладная логика")

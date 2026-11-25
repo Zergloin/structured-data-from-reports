@@ -1,0 +1,1 @@
+Component(worker_repository_comp, "Репозиторий обработчика\nworker_repository_comp", "SQLAlchemy", "Попытки, план, черновик и outbox", $tags="Инфраструктура")
