@@ -1,0 +1,1 @@
+Component(web_viewer, "Просмотр источника\nweb_viewer", "PDF.js facade / React", "PDF и нормализованный текст", $tags="Инфраструктура")

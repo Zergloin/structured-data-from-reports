@@ -1,0 +1,107 @@
+@startuml value_validation_code
+!include ../style.puml
+title Диаграмма классов UML (Level 4) - validation_comp
+' Проверка и выбор режима
+together {
+class ValueValidator {
+  -_policy: ValuePolicy
+  --
+  +__init__(policy: ValuePolicy): None
+  +set_strategy(policy: ValuePolicy): None
+  +validate(schema: SchemaDefinition, \n      values: dict[str, JsonValue], \n      operation: ValidationMode): ValueValidationResult
+}
+interface ValuePolicy <<interface>> {
+  +mode: ValidationMode {readOnly}
+  --
+  +accepts(issues: tuple[ValidationIssue, ...]): bool
+}
+class DraftValueStrategy {
+  +mode: ValidationMode {readOnly}
+  --
+  +accepts(issues: tuple[ValidationIssue, ...]): bool
+}
+class ConfirmValueStrategy {
+  +mode: ValidationMode {readOnly}
+  --
+  +accepts(issues: tuple[ValidationIssue, ...]): bool
+}
+enum ValidationMode {
+  DRAFT = 'draft'
+  CONFIRM = 'confirm'
+}
+}
+' Закреплённая схема
+together {
+class SchemaDefinition <<frozen>> {
+  +schema_id: str
+  +revision: int
+  +schema_json: str
+  +fields: tuple[FieldDefinition, ...]
+  +version_id: str | None = None
+  +schema: dict[str, JsonValue] {readOnly}
+  --
+}
+class FieldDefinition <<frozen>> {
+  +key: str
+  +semantic_id: str
+  +kind: FieldKind
+  +description: str = ''
+  +unit: str | None = None
+  --
+}
+enum FieldKind {
+  STRING = 'string'
+  INTEGER = 'integer'
+  NUMBER = 'number'
+  BOOLEAN = 'boolean'
+}
+}
+' Результат проверки
+together {
+class ValueValidationResult <<frozen>> {
+  +values_json: str
+  +mode: ValidationMode
+  +can_save: bool
+  +can_confirm: bool
+  +issues: tuple[ValidationIssue, ...]
+  --
+}
+class ValidationIssue <<frozen>> {
+  +code: str
+  +path: str
+  +message: str
+  +error: bool = True
+  +blocks_draft: bool = False
+  --
+}
+}
+FieldDefinition "0..*" --> "1" FieldKind : kind
+SchemaDefinition "0..*" --> "0..*" FieldDefinition : fields
+ValuePolicy ..> ValidationIssue : accepts: вход
+ValuePolicy ..> ValidationMode : mode: результат
+ValueValidationResult "0..*" --> "1" ValidationMode : mode
+ValueValidationResult "0..*" --> "0..*" ValidationIssue : issues
+ValueValidator "0..*" --> "1" ValuePolicy : _policy
+ValueValidator ..> SchemaDefinition : validate: вход
+ValueValidator ..> ValidationMode : validate: вход
+ValueValidator ..> ValueValidationResult : validate: результат
+ValuePolicy <|.. DraftValueStrategy
+ValuePolicy <|.. ConfirmValueStrategy
+DraftValueStrategy -[hidden]right-> ConfirmValueStrategy
+' Условия приведены текстом в индивидуальном отчёте.
+' ValueValidator:
+' operation должен совпадать с policy.mode.
+' Проверка схемы и JSON Schema обязательна.
+' Неизвестные поля блокируют сохранение.
+' DraftValueStrategy:
+' mode = DRAFT.
+' Принимает ошибки исправления,
+' если нет blocks_draft=true.
+' ConfirmValueStrategy:
+' mode = CONFIRM.
+' Принимает только отсутствие error=true.
+' ValueValidationResult:
+' can_save: политика принимает и нет blocks_draft.
+' can_confirm: can_save, режим CONFIRM, нет ошибок.
+' Подтверждение и ревизию фиксирует review_comp.
+@enduml

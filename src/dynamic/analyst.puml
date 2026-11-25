@@ -1,0 +1,25 @@
+@startuml dynamic_analyst
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title Analyst: Публикация проверенной версии схемы
+Person(analyst, "Аналитик", "Пользовательская роль")
+Container_Boundary(api_boundary, "api: существующий контейнер") {
+Component(api_controller, "HTTP-контроллеры\napi_controller", "FastAPI / Pydantic", "Принимает запросы веб-клиента и сервисного клиента, проверяет их структуру и вызывает прикладные операции")
+Component(auth_comp, "Доступ и роли\nauth_comp", "Python", "Проверяет личность, роли и разрешения на объект через репозиторий.")
+Component(schema_comp, "Управление схемами\nschema_comp", "Python", "Создаёт, изменяет черновик и публикует неизменяемую версию схемы с описаниями полей.")
+Component(schema_validation_comp, "Проверка схемы\nschema_validation_comp", "jsonschema / Python", "Проверяет JSON Schema, поддерживаемое подмножество, ID полей, единицы и обязательность.")
+Component(repository_comp, "Репозиторий и транзакции\nrepository_comp", "SQLAlchemy", "Согласованные транзакции версий, прав, заданий, outbox и истории; контроль ревизий и попыток.")
+}
+ContainerDb(database, "Общая БД", "PostgreSQL", "Версии и транзакции")
+Rel(analyst, api_controller, "1. Запрашивает публикацию схемы", "HTTPS / JSON")
+Rel(api_controller, auth_comp, "2. Проверяет право публикации и область данных", "Python call")
+Rel(api_controller, schema_comp, "3. Передает схему и ожидаемую ревизию", "Python call")
+Rel(schema_comp, schema_validation_comp, "4. SchemaValidator.validate(schema) с PublishSchemaStrategy", "Python call")
+Rel(schema_comp, repository_comp, "5. При допустимом результате сохраняет следующую версию", "Python call")
+Rel(repository_comp, database, "6. Атомарно проверяет ревизию и публикует версию", "SQL / TLS")
+Rel(schema_comp, api_controller, "7. Возвращает version_id либо список замечаний", "Python return")
+footer
+api - граница развертывания. Классы Strategy не являются отдельными сервисами.
+Номера - хронология данного локального сценария; ответы без изменения состояния сокращены.
+endfooter
+@enduml

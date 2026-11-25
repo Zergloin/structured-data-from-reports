@@ -1,0 +1,25 @@
+@startuml dynamic_techdoc
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title TechDoc: Серверная проверка правок и подтверждение записи
+Person(reviewer, "Эксперт", "Пользовательская роль")
+Container_Boundary(api_boundary, "api: существующий контейнер") {
+Component(api_controller, "HTTP-контроллеры\napi_controller", "FastAPI / Pydantic", "Принимает запросы веб-клиента и сервисного клиента, проверяет их структуру и вызывает прикладные операции")
+Component(auth_comp, "Доступ и роли\nauth_comp", "Python", "Проверяет личность, роли и разрешения на объект через репозиторий.")
+Component(review_comp, "Работа с черновиком\nreview_comp", "Python", "Получает и сохраняет правки, проверяет ревизию и отдельно подтверждает неизменяемую версию.")
+Component(validation_comp, "Проверка значений\nvalidation_comp", "Python / jsonschema", "Проверяет значения по схеме в режимах сохранения и подтверждения без доступа к хранилищам.")
+Component(repository_comp, "Репозиторий и транзакции\nrepository_comp", "SQLAlchemy", "Согласованные транзакции версий, прав, заданий, outbox и истории; контроль ревизий и попыток.")
+}
+ContainerDb(database, "Общая БД", "PostgreSQL", "Версии и транзакции")
+Rel(reviewer, api_controller, "1. Передает правки либо отдельное подтверждение", "HTTPS / JSON")
+Rel(api_controller, auth_comp, "2. Проверяет роль эксперта и доступ к черновику", "Python call")
+Rel(api_controller, review_comp, "3. Передает values, expected_revision и режим", "Python call")
+Rel(review_comp, validation_comp, "4. ValueValidator.validate(schema, values, operation)", "Python call")
+Rel(review_comp, repository_comp, "5. Проверяет основания и ревизию; готовит принятую версию", "Python call")
+Rel(repository_comp, database, "6. При подтверждении атомарно сохраняет версию и решение", "SQL / TLS")
+Rel(review_comp, api_controller, "7. Возвращает результат либо причину отказа", "Python return")
+footer
+api - граница развертывания. Классы Strategy не являются отдельными сервисами.
+Номера - хронология данного локального сценария; ответы без изменения состояния сокращены.
+endfooter
+@enduml

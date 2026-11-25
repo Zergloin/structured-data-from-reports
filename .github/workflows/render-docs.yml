@@ -1,0 +1,54 @@
+name: Architecture CI
+on:
+  push:
+    branches: [main, 'feature/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: architecture-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    name: architecture-build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PLANTUML_LIMIT_SIZE: '18000'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz fonts-dejavu-core
+          python3 -m pip install -r ci/requirements.txt
+      - name: Check architecture stage
+        id: architecture
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: python3 ci/build.py --mode auto --base-ref "$BASE_SHA"
+      - name: Upload architecture
+        if: success()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: architecture-${{ steps.architecture.outputs.scope }}-${{ github.sha }}
+          path: .build/artifacts/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload verification logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: verification-${{ github.sha }}
+          path: |
+            .build/logs/
+            .build/summary.json
+          retention-days: 30

@@ -1,0 +1,23 @@
+@startuml schema_management_components
+!include ../style.puml
+!define RELATIVE_INCLUDE
+!define ISIT_CONTAINER_VIEW
+title Схемы и правила извлечения\nC4: компоненты контейнера api
+!include ../shared/container_nodes/database.puml
+!include ../shared/container_nodes/web_app.puml
+Container_Boundary(api, "api: компоненты одного процесса") {
+!include ../shared/components/api_controller.puml
+!include ../shared/components/auth_comp.puml
+!include ../shared/components/schema_comp.puml
+!include ../shared/components/schema_validation_comp.puml
+!include ../shared/components/repository_comp.puml
+}
+Rel(api_controller, auth_comp, "A01: Проверяет действие и объект", "Python Call")
+Rel(auth_comp, repository_comp, "A02: Читает пользователя и права", "Python Call")
+Rel(api_controller, schema_comp, "S01: Передаёт команду изменения схемы", "Python Call")
+Rel(schema_comp, schema_validation_comp, "S02: Проверяет описание и ограничения", "Python Call")
+Rel(schema_comp, repository_comp, "S03: Сохраняет черновик или новую версию", "Python Call")
+Rel(web_app, api_controller, "N01: Передаёт данные пользовательских операций", "HTTPS / JSON, multipart")
+Rel(repository_comp, database, "N02: Читает и записывает версии, права и задания", "SQL / PostgreSQL")
+footer Стрелка: инициатор → получатель; ответы опущены. AMQP обозначает доставку команды.\nПовторы обоих обработчиков публикует dispatch_comp API через outbox.
+@enduml

@@ -1,0 +1,1 @@
+Component(int_archive, "Адаптер архива\nint_archive", "HTTPX", "Внешняя версия документа", $tags="Инфраструктура")

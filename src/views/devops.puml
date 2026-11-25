@@ -1,0 +1,16 @@
+!ifdef ISIT_CONTAINER_NODES
+!include ../shared/container_nodes/web_app.puml
+!include ../shared/container_nodes/api.puml
+!include ../shared/container_nodes/extraction_queue.puml
+!include ../shared/container_nodes/integration_queue.puml
+!include ../shared/container_nodes/worker.puml
+!include ../shared/container_nodes/integration.puml
+!else
+!include ../shared/container_relations/admin__web_app.puml
+!include ../shared/container_relations/web_app__api.puml
+!include ../shared/container_relations/api__extraction_queue.puml
+!include ../shared/container_relations/api__integration_queue.puml
+!include ../shared/container_relations/extraction_queue__worker.puml
+!include ../shared/container_relations/integration_queue__integration.puml
+!include ../shared/container_relations/integration__api.puml
+!endif

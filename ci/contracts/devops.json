@@ -1,0 +1,21 @@
+{
+  "owner": "devops",
+  "checks": [
+    {
+      "source": "src/components/integrations_components.puml",
+      "required_ids": [
+        "int_flow",
+        "int_consumer",
+        "int_api",
+        "int_archive",
+        "int_analytics"
+      ],
+      "required_edges": [
+        [
+          "int_flow",
+          "int_api"
+        ]
+      ]
+    }
+  ]
+}

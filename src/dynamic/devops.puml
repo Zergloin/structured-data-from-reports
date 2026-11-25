@@ -1,0 +1,26 @@
+@startuml dynamic_devops
+!include ../style.puml
+!define RELATIVE_INCLUDE
+title DevOps: Передача снимка и согласование неизвестного исхода
+Container_Boundary(integration_boundary, "integration: существующий контейнер") {
+Component(int_consumer, "Приёмник интеграций\nint_consumer", "Celery task", "Принимает команду integration, вызывает сценарий обмена и подтверждает доставку после сохранённого исхода")
+Component(int_flow, "Сценарий обмена\nint_flow", "Python", "Импорт из архива или экспорт подтверждённого снимка, согласование результата.")
+Component(int_api, "Адаптер API системы\nint_api", "HTTPX / Pydantic", "Получает задание, временное право на обработку и снимок; регистрирует импорт и фиксирует результат через ")
+Component(int_analytics, "Адаптер аналитики\nint_analytics", "HTTPX", "Отправляет снимок по идентификатору выгрузки, проверяет состояние доставки при доступности такого API.")
+}
+ContainerQueue(integration_queue, "Очередь интеграций", "RabbitMQ", "job_id; manual ACK")
+System_Ext(bi, "Аналитическая система", "Внешняя система")
+Rel(integration_queue, int_consumer, "1. Доставляет integration.v1(job_id)", "AMQPS / Celery JSON")
+Rel(int_consumer, int_flow, "2. IntegrationContext.process(job_id)", "Python call")
+Rel(int_flow, int_api, "3. SystemApi.claim: получает запрос и lease", "Python call / HTTPS к API")
+Rel(int_flow, int_api, "4. SystemApi.delivery_started: сохраняет намерение", "Python call / HTTPS к API")
+Rel(int_flow, int_analytics, "5. AnalyticsPort.send(export_id, records)", "Python call")
+Rel(int_analytics, bi, "6. Отправляет снимок; ответ теряется", "HTTPS / JSON")
+Rel(int_analytics, bi, "7. AnalyticsPort.status(export_id): выясняет прием", "HTTPS / JSON")
+Rel(int_flow, int_api, "8. SystemApi.finish либо schedule_retry / manual", "Python call / HTTPS к API")
+Rel(int_consumer, integration_queue, "9. ACK, если ProcessingResult.ack=true", "AMQPS")
+footer
+integration - граница развертывания. Классы Strategy не являются отдельными сервисами.
+Номера - хронология данного локального сценария; ответы без изменения состояния сокращены.
+endfooter
+@enduml

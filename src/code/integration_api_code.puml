@@ -1,0 +1,166 @@
+@startuml integration_api_code
+!include ../style.puml
+title Диаграмма классов UML (Level 4) - int_flow
+' Контракты заданий
+together {
+class ImportRequest <<frozen>> {
+  +job_id: str
+  +external_id: str
+  +external_version: str
+  +schema_version: str | None = None
+  --
+}
+class ExportRequest <<frozen>> {
+  +job_id: str
+  +export_id: str
+  +records: tuple[ConfirmedRecord, ...]
+  --
+}
+class ExecutionLease <<frozen>> {
+  +request: IntegrationRequest
+  +attempt: int
+  +token: int
+  +terminal_state: str | None = None
+  --
+}
+class ProcessingResult <<frozen>> {
+  +state: str
+  +ack: bool
+  +detail: str
+  --
+}
+}
+' Данные и подтверждённые версии
+together {
+class ExternalDocument <<frozen>> {
+  +external_id: str
+  +version: str
+  +content: bytes
+  +checksum: str
+  --
+}
+class ConfirmedRecord <<frozen>> {
+  +version_id: str
+  +document_version_id: str
+  +schema: SchemaDefinition
+  +values_json: str
+  +confirmed: bool = True
+  +values: dict[str, JsonValue] {readOnly}
+  --
+}
+class SchemaDefinition <<frozen>> {
+  +schema_id: str
+  +revision: int
+  +schema_json: str
+  +fields: tuple[FieldDefinition, ...]
+  +version_id: str | None = None
+  +schema: dict[str, JsonValue] {readOnly}
+  --
+}
+}
+' API и состояние прототипа
+together {
+interface SystemApi <<interface>> {
+  --
+  +claim(job_id: str, operation: str): ExecutionLease
+  +register_import(lease: ExecutionLease, \n      document: ExternalDocument): str
+  +delivery_started(lease: ExecutionLease, export_id: str\n    ): bool
+  +finish(lease: ExecutionLease, state: str, detail: str\n    ): None
+  +schedule_retry(lease: ExecutionLease, detail: str\n    ): None
+}
+class MemorySystemApi {
+  -_jobs: dict[str, _Job]
+  -_imports: dict[tuple[str, str],\n    ExternalDocument]
+  -_deliveries: dict[str, str]
+  +outbox: list[tuple[str, str]]
+  +extraction_jobs: list[tuple[str, str]]
+  +available: bool
+  --
+  +__init__(): None
+  +register_job(request: IntegrationRequest): None
+  +claim(job_id: str, operation: str): ExecutionLease
+  -_check(lease: ExecutionLease): _Job
+  +expire_lease(job_id: str): None
+  +register_import(lease: ExecutionLease, \n      document: ExternalDocument): str
+  +delivery_started(lease: ExecutionLease, export_id: str\n    ): bool
+  +finish(lease: ExecutionLease, state: str, detail: str\n    ): None
+  +schedule_retry(lease: ExecutionLease, detail: str\n    ): None
+}
+class _Job {
+  +request: IntegrationRequest
+  +attempt: int = 0
+  +token: int = 0
+  +state: str = 'pending'
+  +detail: str = ''
+  --
+}
+}
+' Внешние порты и адаптеры
+together {
+interface ArchivePort <<interface>> {
+  --
+  +fetch(external_id: str, version: str\n    ): ExternalDocument
+}
+class MemoryArchive {
+  -_document: ExternalDocument
+  -_failures: int
+  --
+  +__init__(document: ExternalDocument, failures: int = 0\n    ): None
+  +fetch(external_id: str, version: str\n    ): ExternalDocument
+}
+interface AnalyticsPort <<interface>> {
+  +supports_idempotency: bool {readOnly}
+  --
+  +status(export_id: str): str
+  +send(export_id: str, \n      records: tuple[ConfirmedRecord, ...]): None
+}
+class MemoryAnalytics {
+  -_idempotent: bool
+  -_status_supported: bool
+  -_timeout: bool
+  +sent: dict[str, tuple[ConfirmedRecord, ...]]
+  +send_calls: int
+  +supports_idempotency: bool {readOnly}
+  --
+  +__init__(idempotent: bool = True, \n      status_supported: bool = True, \n      timeout_after_send: bool = False): None
+  +status(export_id: str): str
+  +send(export_id: str, \n      records: tuple[ConfirmedRecord, ...]): None
+}
+}
+AnalyticsPort ..> ConfirmedRecord : send: вход
+ArchivePort ..> ExternalDocument : fetch: результат
+ConfirmedRecord "0..*" --> "1" SchemaDefinition : schema
+ExecutionLease "0..*" --> "0..1" ExportRequest : request (export)
+ExecutionLease "0..*" --> "0..1" ImportRequest : request (import)
+ExportRequest "0..*" --> "0..*" ConfirmedRecord : records
+MemoryAnalytics "0..*" --> "0..*" ConfirmedRecord : sent
+MemoryArchive "0..*" --> "1" ExternalDocument : _document
+MemorySystemApi "0..*" --> "0..*" _Job : _jobs
+MemorySystemApi "0..*" --> "0..*" ExternalDocument : _imports
+SystemApi ..> ExecutionLease : параметры и результаты
+SystemApi ..> ExternalDocument : register_import: вход
+_Job "0..*" --> "0..1" ExportRequest : request (export)
+_Job "0..*" --> "0..1" ImportRequest : request (import)
+SystemApi <|.. MemorySystemApi
+ArchivePort <|.. MemoryArchive
+AnalyticsPort <|.. MemoryAnalytics
+' Условия приведены текстом в индивидуальном отчёте.
+' MemorySystemApi:
+' Импорт уникален по external_id и version.
+' Повтор с другим checksum отклоняется.
+' При наличии схемы регистрируются извлечение и outbox.
+' Экспорт закрепляется за одним job_id.
+' _Job:
+' state: pending, running, retry,
+' succeeded, failed, manual.
+' _check проверяет token и активное состояние.
+' Память процесса моделирует операции API.
+' ExportRequest:
+' records содержит только подтверждённые снимки
+' с версиями записи, документа и схемы.
+' Внешний получатель не определяет их подтверждение.
+' MemoryAnalytics:
+' Тайм-аут возможен после принятия данных.
+' status и supports_idempotency определяют
+' возможность безопасного повтора.
+@enduml

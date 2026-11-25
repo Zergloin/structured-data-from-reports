@@ -1,0 +1,1 @@
+Component(int_api, "Адаптер API системы\nint_api", "HTTPX / Pydantic", "Задание, снимок, исход и повтор", $tags="Инфраструктура")

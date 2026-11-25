@@ -1,0 +1,24 @@
+@startuml extraction_dynamic
+!include ../style.puml
+!define RELATIVE_INCLUDE
+!define ISIT_CONTAINER_VIEW
+title Обработка документа: порции, проверка и сохранение черновика
+!include ../shared/container_nodes/api.puml
+!include ../shared/container_nodes/extraction_queue.puml
+!include ../shared/container_nodes/worker.puml
+!include ../shared/container_nodes/database.puml
+!include ../shared/container_nodes/files.puml
+!include ../shared/external_llm.puml
+Rel(api, files, "1. Сохраняет неизменяемый оригинал", "S3 API / HTTPS")
+Rel(api, database, "2. Атомарно регистрирует версию, задание и outbox", "SQL / PostgreSQL")
+Rel(api, extraction_queue, "3. dispatch_comp публикует команду с job_id", "AMQP / Celery JSON")
+Rel(extraction_queue, worker, "4. Доставляет команду в task_comp", "AMQP / Celery JSON")
+Rel(worker, database, "5. Получает право исполнения, схему и сохранённый план", "SQL / PostgreSQL")
+Rel(worker, files, "6. Читает оригинал; сохраняет разбор через файловый адаптер", "S3 API / HTTPS")
+Rel(worker, llm, "7. extractor_comp запрашивает кандидатов для очередной порции", "HTTPS / JSON")
+Rel(worker, database, "8. Конвейер сохраняет план, кандидатов и продлевает право исполнения", "SQL / PostgreSQL")
+Rel(worker, database, "9. Проверяет покрытие и источники; сохраняет черновик и успешный исход", "SQL / PostgreSQL")
+Rel(worker, extraction_queue, "10. ACK после сохранения исхода", "AMQP")
+Rel(api, database, "11. По запросу клиента читает прогресс и черновик", "SQL / PostgreSQL")
+footer Шаги 7-8 повторяются для порций и групп полей. Планирование и сборка входят в extractor_comp.\nОбработчики сохраняют необходимость повтора в outbox; повтор публикует только dispatch_comp API.\nACK подтверждает доставку сообщения, а данные отдельно подтверждает человек.
+@enduml
