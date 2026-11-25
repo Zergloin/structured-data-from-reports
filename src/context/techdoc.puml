@@ -1,0 +1,11 @@
+@startuml context_techdoc
+!include ../style.puml
+title Контекст: Технический писатель
+!include ../shared/context_base.puml
+!include ../shared/person_reviewer.puml
+!include ../shared/relations/review.puml
+!include ../shared/relations/llm.puml
+!include ../shared/relations/archive.puml
+!include ../shared/relations/bi.puml
+footer Фокус участника; идентификаторы взяты из общего контекста.
+@enduml

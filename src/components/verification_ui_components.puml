@@ -1,0 +1,31 @@
+@startuml verification_ui_components
+!include ../style.puml
+!define RELATIVE_INCLUDE
+!define ISIT_CONTAINER_VIEW
+title Прикладной сценарий верификации\nC4: компоненты контейнера web_app
+!include ../shared/container_nodes/api.puml
+Container_Boundary(web_app, "web_app: компоненты одного процесса") {
+Boundary(web_app_layer_0, "Вход") {
+!include ../shared/components/web_review.puml
+}
+Boundary(web_app_layer_1, "Прикладная логика") {
+!include ../shared/components/web_session.puml
+!include ../shared/components/web_evidence.puml
+}
+Boundary(web_app_layer_2, "Предметная логика") {
+!include ../shared/components/web_rules.puml
+}
+Boundary(web_app_layer_3, "Инфраструктура") {
+!include ../shared/components/web_viewer.puml
+!include ../shared/components/web_api.puml
+}
+}
+Rel(web_review, web_session, "F01: Передаёт правки и решение пользователя", "TypeScript Call")
+Rel(web_session, web_rules, "F02: Проверяет значения и команду", "TypeScript Call")
+Rel(web_session, web_api, "F03: Передаёт данные запроса черновика и решения", "TypeScript Call")
+Rel(web_review, web_evidence, "F04: Передаёт выбранный источник поля", "TypeScript Call")
+Rel(web_evidence, web_api, "F05: Запрашивает оригинал или фрагмент", "TypeScript Call")
+Rel(web_evidence, web_viewer, "F06: Передаёт источник и позицию", "TypeScript Call")
+Rel(web_api, api, "N10: api_controller: Запрашивает черновик, источник; сохраняет решение", "HTTPS / JSON, binary")
+footer Стрелка: инициатор → получатель; ответы опущены. AMQP обозначает доставку команды.\nПовторы обоих обработчиков публикует dispatch_comp API через outbox.
+@enduml
